@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+    
+    <div id="homepage-block">
+        <h1 id="homepage-title">Help Me Relocate</h1>
+    </div>
+
+    <form action="/show_city">
+        Zipcode: <input type="text" name="zipcode"></input><br><br>
+        <input type="submit" name="submit"></input>
+    </form>
+
+
+{% endblock %}

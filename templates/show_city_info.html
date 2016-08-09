@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <a href="/show_city/{{ zipcode.zip }}">
+
+    City name is {{ zipcode.city }}. <br>
+    State name is {{zipcode.state}}
+    
+    </a>
+
+{% endblock %}
