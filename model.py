@@ -9,6 +9,35 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+class School(db.Model):
+    """User sign in details"""
+    __tablename__ = "schools"
+
+    gsid = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    schoolType = db.Column(db.String(64), nullable=True)
+    grade_range = db.Column(db.String(64), nullable=True)
+    rating = db.Column(db.String(15), nullable=True)
+    city = db.Column(db.String(15), nullable=False)
+    state = db.Column(db.String(64), nullable=False)
+    address = db.Column(db.Text, nullable=False)
+    phone = db.Column(db.String(64), nullable=False)
+    website = db.Column(db.Text, nullable=True)
+    latitude = db.Column(db.String(64), nullable=False)
+    longitude = db.Column(db.String(64), nullable=False)
+    gsSchoolOverviewLink = db.Column(db.Text, nullable=True)
+    gsRatinglink = db.Column(db.Text, nullable=True)
+
+    reviews = db.Column(db.String(15), nullable=False)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<School gs_id=%s zipcode=%s name=%s>" % (self.gs_id, self.zipcode, self.name)
+
+
+
+
 class User(db.Model):
     """User sign in details"""
     __tablename__ = "users"
@@ -38,21 +67,6 @@ class City(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed"""
         return "<City city_name=%s zipcode=%s>" % (self.city_name, self.zipcode)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

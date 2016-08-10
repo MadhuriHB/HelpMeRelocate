@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Each School details go here. -->
+{% for schoolObject in schoolObjects %}
+
+    gsid: {{ schoolObject.gsid }} <br>
+    Name: {{ schoolObject.name }} <br>
+    Type: {{ schoolObject.schoolType }} <br>
+    grade_range: {{ schoolObject.grade_range }} <br>
+    Rating: {{ schoolObject.rating }} <br>
+    City: {{ schoolObject.city }} <br>
+    State: {{ schoolObject.state }} <br>
+    Address: {{ schoolObject.address }} <br>
+    Phone: {{ schoolObject.phone }} <br>
+    Website: {{ schoolObject.website }} <br><br>
+    More about School Overview:
+    <a href="{{ schoolObject.gsSchoolOverviewLink }}">{{ schoolObject.gsSchoolOverviewLink }}</a> <br><br>
+    More about School Rating:
+    <a href="{{ schoolObject.gsRatinglink }}">
+    {{ schoolObject.gsRatinglink }}</a>
+
+    <br><br><br><br>
+
+
+{% endfor %}
+
+
+   
+{% endblock %}
