@@ -1,5 +1,4 @@
 """Help me Relocate"""
-
 from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, request
@@ -11,6 +10,7 @@ from pyzipcode import ZipCodeDatabase
 
 import requests
 import os
+
 import untangle
 
 app = Flask(__name__)
@@ -44,31 +44,11 @@ def show_city_info():
 
 @app.route("/show_city/<int:zipcode>")
 def show_city_on_map(zipcode):
-    zipcode = zcdb[zipcode]
-    latitude = zipcode.latitude
-    longitude = zipcode.longitude
-    resp = requests.get("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%s,%s&radius=50&key=%s" % (latitude, longitude, API_KEY))
-    resp = resp.json()
-    # direct_image_url = resp.json()['results'][5]['photos'][0]['html_attributions']
-    # reference_str = resp.json()['results'][5]['photos'][0]['photo_reference']
+    pass
+    resp = requests.get("http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=20&minx=-34&miny=-118&maxx=34&maxy=118&size=medium&mapfilter=true")
+    print "This is the response!!!!!!!!!!!!!", resp.json()
 
-    photos_to_show = []
-
-   
-    for result in resp['results']:
-        photos = result.get("photos")
-        if photos:
-            photos_to_show.append(photos[0]['photo_reference'])
-
-    payload = {'photoreference': photos_to_show[0], 'maxheight': '400', 'key': API_KEY}
-
-    photo_resp = requests.get("https://maps.googleapis.com/maps/api/place/photo", params=payload)
-    
-    import pdb; pdb.set_trace()
-    print photo_resp.content
-
-
-    return render_template("show_map.html", zipcode=zipcode, photos_to_show=photo_resp)
+    return render_template("show_map.html", zipcode=zipcode)
 
 
 @app.route("/show_school/<int:zipcode>")
@@ -82,11 +62,9 @@ def show_school_ratings(zipcode):
     state = zipcode.state
     zip1 = zipcode.zip
 
-
-    
+    #Api call to get school information
     resp = requests.get("http://api.greatschools.org/schools/nearby?key=%s&state=%s&zip=%s" % (API_KEY_GS, state, zip1))
-    
-  
+      
     resp = resp.text
     
     #Parse the api response string using xml_dom
@@ -94,51 +72,42 @@ def show_school_ratings(zipcode):
 
     #Get a list of objects with tagname school
     xml_school_list = xml_dom.getElementsByTagName('school')
-
+    
+    node_dict = {}
+    
     #create empty school object list
     schoolObjects = []
+
     for xmlSchool in xml_school_list:
-        #for each school, find the dataif len(xmlSchool.childNodes) > 20:
-        i = 0
-        while i < len(xmlSchool.childNodes):
+        sChildNodes = xmlSchool.childNodes
+           
+        for childnode in sChildNodes:
+            name = childnode.nodeName
+            if childnode.hasChildNodes():
+                node_dict[name] = childnode.childNodes[0].toxml()           
+            else:
+                node_dict[name] = childnode.toxml()
 
-            gsid = xmlSchool.childNodes[0].childNodes[0].toxml()
-            name = xmlSchool.childNodes[1].childNodes[0].toxml()
-            type_of_school = xmlSchool.childNodes[2].childNodes[0].toxml()
-            grade_range = xmlSchool.childNodes[3].childNodes[0].toxml()
-            rating = xmlSchool.childNodes[5].childNodes[0].toxml()
-            city = xmlSchool.childNodes[7].childNodes[0].toxml()
-            state = xmlSchool.childNodes[8].childNodes[0].toxml()
-            address = xmlSchool.childNodes[12].childNodes[0].toxml()
-            phone = xmlSchool.childNodes[13].childNodes[0].toxml()
-            website = xmlSchool.childNodes[15].childNodes[0].toxml()
-            latitude = xmlSchool.childNodes[17].childNodes[0].toxml()
-            longitude = xmlSchool.childNodes[18].childNodes[0].toxml()
-            gsSchoolOverviewLink = xmlSchool.childNodes[19].childNodes[0].toxml()
-            gsRatinglink = xmlSchool.childNodes[20].childNodes[0].toxml()
-
-            #Create temporary School instance for each school and append it to a list 
-            tempSchoolObject = School(gsid=gsid, name=name, schoolType=type_of_school,
-                                      grade_range=grade_range, rating=rating,
-                                      city=city, state=state, address=address,
-                                      phone=phone, website=website,
-                                      latitude=latitude, longitude=longitude,
-                                      gsSchoolOverviewLink=gsSchoolOverviewLink,
-                                      gsRatinglink=gsRatinglink)
-
-            schoolObjects.append(tempSchoolObject)
+        #Temporary school object for each school         
+        tempSchoolObject = School(gsid=node_dict.get("gsId"), name=node_dict.get("name"), schoolType=node_dict.get("type"),
+                                  gradeRange=node_dict.get("gradeRange"), city=node_dict.get("city"),
+                                  state=node_dict.get("state"), address=node_dict.get("address"),
+                                  phone=node_dict.get("phone"), website=node_dict.get("website"),
+                                  latitude=node_dict.get("lat"), longitude=node_dict.get("lon"),
+                                  parentRating=node_dict.get("parentRating"),
+                                  overviewLink=node_dict.get("overviewLink"), 
+                                  ratingsLink=node_dict.get("ratingsLink"),
+                                  reviewsLink=node_dict.get("reviewsLink"))
+    
+        schoolObjects.append(tempSchoolObject)
             
-    #import pdb; pdb.set_trace()
+    return render_template("school_details.html", schoolObjects=schoolObjects)
 
-    """ FIX ME. Try later if u have more time"""
-        # API call to get profile for each school 
-        # xml_SchoolProfile = requests.get(
-        #     "http://api.greatschools.org/schools/%s/%s?key=%s" 
-        #     % (state, gsid, API_KEY_GS))
-       
-
-    return render_template ("school_details.html", schoolObjects=schoolObjects)
-
+    # """ FIX ME. Try later if u have more time"""
+    #     # API call to get profile for each school 
+    #     # xml_SchoolProfile = requests.get(
+    #     #     "http://api.greatschools.org/schools/%s/%s?key=%s" 
+    #     #     % (state, gsid, API_KEY_GS))       
 
 
 if __name__ == "__main__":

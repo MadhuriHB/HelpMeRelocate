@@ -16,8 +16,8 @@ class School(db.Model):
     gsid = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     schoolType = db.Column(db.String(64), nullable=True)
-    grade_range = db.Column(db.String(64), nullable=True)
-    rating = db.Column(db.String(15), nullable=True)
+    gradeRange = db.Column(db.String(64), nullable=True)
+    parentRating = db.Column(db.String(15), nullable=True)
     city = db.Column(db.String(15), nullable=False)
     state = db.Column(db.String(64), nullable=False)
     address = db.Column(db.Text, nullable=False)
@@ -25,17 +25,14 @@ class School(db.Model):
     website = db.Column(db.Text, nullable=True)
     latitude = db.Column(db.String(64), nullable=False)
     longitude = db.Column(db.String(64), nullable=False)
-    gsSchoolOverviewLink = db.Column(db.Text, nullable=True)
-    gsRatinglink = db.Column(db.Text, nullable=True)
-
-    reviews = db.Column(db.String(15), nullable=False)
-
+    overviewLink = db.Column(db.Text, nullable=True)
+    ratingsLink = db.Column(db.Text, nullable=True)
+    reviewsLink = db.Column(db.Text, nullable=True)
+    
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<School gs_id=%s zipcode=%s name=%s>" % (self.gs_id, self.zipcode, self.name)
-
-
 
 
 class User(db.Model):

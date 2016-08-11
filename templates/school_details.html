@@ -7,24 +7,29 @@
     gsid: {{ schoolObject.gsid }} <br>
     Name: {{ schoolObject.name }} <br>
     Type: {{ schoolObject.schoolType }} <br>
-    grade_range: {{ schoolObject.grade_range }} <br>
-    Rating: {{ schoolObject.rating }} <br>
+    grade_range: {{ schoolObject.gradeRange }} <br>
+    Parent Rating: {{ schoolObject.parentRating }} <br>
     City: {{ schoolObject.city }} <br>
     State: {{ schoolObject.state }} <br>
     Address: {{ schoolObject.address }} <br>
     Phone: {{ schoolObject.phone }} <br>
     Website: {{ schoolObject.website }} <br><br>
+    
     More about School Overview:
-    <a href="{{ schoolObject.gsSchoolOverviewLink }}">{{ schoolObject.gsSchoolOverviewLink }}</a> <br><br>
+    <a href="{{ schoolObject.overviewLink }}"> {{ schoolObject.overviewLink }} </a> 
+    <br><br>
+    
     More about School Rating:
-    <a href="{{ schoolObject.gsRatinglink }}">
-    {{ schoolObject.gsRatinglink }}</a>
+    <a href="{{ schoolObject.ratingsLink }}">
+    {{ schoolObject.ratingsLink }}</a> 
+    <br><br>
 
+    Go to School Reviews:
+    <a href="{{ schoolObject.reviewsLink }}"> {{ schoolObject.reviewsLink }} </a>
     <br><br><br><br>
 
 
 {% endfor %}
-
 
    
 {% endblock %}
