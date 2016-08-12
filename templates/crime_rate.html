@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+
+   {% for crime in crime_data %}
+       {{ crime_type }} :  {{ crime_data['crimeType'] }}
+
+   {% endfor %}
+
+{% endblock %}

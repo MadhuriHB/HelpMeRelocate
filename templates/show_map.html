@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 
-   
+   {% for image in images %}
+
+        <img src= {{image["src"]}} alt="city-Images" style="width:304px;height:228px;">
+
+
+   {% endfor %}
    
 {% endblock %}
