@@ -8,6 +8,18 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+class Neighborhood(db.Model):
+    """ Neighborhood information"""
+
+    __tablename__ = "neighborhood"
+    
+    neighborhood_id = db.Column(db.String(10), primary_key=True, nullable=False)
+    #neighborhood_image = 
+
+    #map
+    #image
+
+
 
 class School(db.Model):
     """User sign in details"""
@@ -28,12 +40,70 @@ class School(db.Model):
     overviewLink = db.Column(db.Text, nullable=True)
     ratingsLink = db.Column(db.Text, nullable=True)
     reviewsLink = db.Column(db.Text, nullable=True)
-    
+
+    neighborhood_id = db.Column(db.Integer, db.ForeignKey(Neighborhood.neighborhood_id), nullable=False)
+
+    neighborhood = db.relationship("Neighborhood", backref="schools")
+
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<School gs_id=%s zipcode=%s name=%s>" % (self.gs_id, self.zipcode, self.name)
 
+
+class CostOfLiving(db.Model):
+    """ Cost of living index and price list for each city"""
+#one to one relationship with Neighborhood
+    __tablename__ = "costOfLiving"
+
+
+    neighborhood = db.relationship("Neighborhood", db.backref("costOfLiving", uselist=False))
+
+
+class PriceList(db.Model):
+    """ Average price list """
+# one to many relationship with Neighborhood
+
+    __tablename__ = "priceList"
+    neighborhood = db.relationship("Neighborhood", backref="priceList")
+
+
+class Crime(db.Model):
+    """crime index """
+# one to one relationship with Neighborhood    
+    __tablename__ = "crimeRate"
+
+    crime_increasing = db.Column(db.String(20), nullable=True)
+    contributors = db.Column(db.String(20), nullable=True) 
+    city_id = db.Column(db.String(20), nullable=True) 
+    worried_mugged_robbed = db.Column(db.String(20), nullable=True)  
+    worried_home_broken = db.Column(db.String(20), nullable=True) 
+    problem_property_crimes = db.Column(db.String(20), nullable=True)  
+    worried_things_car_stolen = db.Column(db.String(20), nullable=True) 
+    level_of_crime = db.Column(db.String(20), nullable=True) 
+    worried_insulted = db.Column(db.String(20), nullable=True) 
+    problem_drugs = db.Column(db.String(20), nullable=True) 
+    worried_attacked = db.Column(db.String(20), nullable=True) 
+    problem_violent_crimes = db.Column(db.String(20), nullable=True) 
+    worried_skin_ethnic_religion = db.Column(db.String(20), nullable=True) 
+    safe_alone_night = db.Column(db.String(20), nullable=True) 
+    safe_alone_daylight = db.Column(db.String(20), nullable=True) 
+    yearLastUpdate = db.Column(db.String(20), nullable=True) 
+    index_crime = db.Column(db.String(20), nullable=True) 
+    name = db.Column(db.String(20), nullable=True) 
+    monthLastUpdate = db.Column(db.String(20), nullable=True) 
+    problem_corruption_bribery = db.Column(db.String(20), nullable=True) 
+    index_safety = db.Column(db.String(20), nullable=True) 
+    worried_car_stolen = db.Column(db.String(20), nullable=True) 
+
+    neighborhood_id = db.Column(db.Integer, db.ForeignKey(Neighborhood.neighborhood_id), nullable=False)
+    neighborhood = db.relationship("Neighborhood", db.backref("crime_rate", uselist=False))
+
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Crime city=%s crime_index=%s safety_index=%s>" % (self.name, self.index_crime, self.index_safety)
 
 class User(db.Model):
     """User sign in details"""
@@ -48,24 +118,23 @@ class User(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<User user_id=%s zipcode=%s>" % (self.user_id, self.zipcode)
+        return "<User user_id=%s email=%s zipcode=%s>" % (self.user_id, self.email, self.zipcode)
 
-
-class City(db.Model):
-    """city information"""
-
-    __tablename__ = "cities"
-
-    city_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    city_name = db.Column(db.String(80))
-    zipcode = db.Column(db.Integer, nullable=False)
-    population = db.Column(db.Integer, nullable=True)
+        
+class Favorites(db.Model):
+    """ specific user's Favorite neighborhoods"""
+   #Association table between User and Neighborhood  
+    fav_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey(User.user_id),
+                        nullable=False)
+    neighborhood_id = db.Column(db.Integer,
+                                db.ForeignKey('neighborhood.neighborhood_id'),
+                                nullable=False)
 
     def __repr__(self):
-        """Provide helpful representation when printed"""
-        return "<City city_name=%s zipcode=%s>" % (self.city_name, self.zipcode)
-
-
+        return "<Favorites neighborhood_id=%s user_id=%s >" % (self.neighborhood_id, self.user_id)
+ 
 
 ##############################################################################
 # Helper functions

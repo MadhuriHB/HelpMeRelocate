@@ -1,11 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <a href="/show_city/{{ zipcode.zip }}">
-
-    City name is {{ zipcode.city }}. <br>
-    State name is {{zipcode.state}}   
     
-    </a>
+    <div>
+        <button id="{{ city }}" class="favorite-btn">&hearts;Favorite </button>
+    </div>
+        
+    {% for image in images %}
+        <img src= {{image["src"]}} alt="city-Images" style="width:304px;height:228px;">
+    {% endfor %}
+    <br><br>
+    City name is {{ city }}. <br>
+    State name is {{ state }}   
+    <a href="/show_school">Show schools</a> <br>
+    <a href="/cost_of_living">Show Cost of Living</a><br>
+    <a href="/crime_rate">Show crime rate </a><br>
+    <script type="text/javascript">
+
+        $(function () { // this is the jquery shortcut for document.ready()
+
+            function addToFavorites(evt) {
+
+                var id = this.id; // this is the id on the button we clicked, which is the image's id
+
+                $.post("/add-to-favorites", {'id': id}, addToFavoritesSuccess);
+            }
+
+            function addToFavoritesSuccess(result) {
+
+                console.log(result.status);
+
+                var id = result.id;
+
+                $('#' + id).css('color', 'red'); // give our user some feedback
+            }
+
+            $('.favorite-btn').click(addToFavorites);
+
+        });
+
+
+    </script>
 
 {% endblock %}

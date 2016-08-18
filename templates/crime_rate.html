@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 
-   {% for crime in crime_data %}
-       {{ crime_type }} :  {{ crime_data['crimeType'] }}
+   {% for crime_type, crime in crime_data.items() %}
+       
+       {{ crime_type }} : {{ crime }} <br><br>
 
    {% endfor %}
 

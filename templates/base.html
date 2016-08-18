@@ -2,21 +2,26 @@
 <html>
 <head>
     <title>Relocate</title>
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    
 </head>
 <body>
 
 
 
-<!-- {% if "user_id" in session %}
+{% if "user_id" in session %}
     <a href="/logout">Logout</a>
 {% else %}
-    <a href="/login">Login</a>
+    <a href="/login">Login</a> &nbsp; &nbsp;
+    <a href="/register">Register</a>
 {% endif %}
- -->
-<hr>
+
+ 
+
+
 
 {% for flash in get_flashed_messages() %}
-  {{ flash }}
+    <div class="alert alert-messages" style="width:90%; margin:0 auto;">{{ flash }}</div>
 {% endfor %}
 
 {% block content %}

@@ -1,18 +1,17 @@
 """Help me Relocate"""
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, flash, session, jsonify
+
 from flask_debugtoolbar import DebugToolbarExtension
 from xml.dom.minidom import parse, parseString
 
-from model import connect_to_db, db, School
+from model import connect_to_db, db, School, User
 from pyzipcode import ZipCodeDatabase
-#import geopy
 
-#import urllib
-import urllib2
-from bs4 import BeautifulSoup
 
+from helper import get_global_zipcodeObject, find_zipcode_from_input, get_city_images, get_schools
+from helper import find_nearest_city
 
 import requests
 import os
@@ -21,9 +20,9 @@ import os
 app = Flask(__name__)
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
+
+
 zcdb = ZipCodeDatabase()
-
-
 # Normally, if you use an undefined variable in Jinja2, it fails silently.
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
@@ -31,181 +30,150 @@ API_KEY = os.environ.get("API_KEY")
 API_KEY_GS = os.environ.get("api_key_gs")
 API_KEY_NUMBEO = os.environ.get("API_KEY_NUMBEO")
 
+
 @app.route('/')
 def index():
     """Homepage."""
-
+    
     return render_template("index.html")
 
 
-@app.route('/show_city')
-def show_city_info():
-    """find the city and state for the zipcode input"""
-    zipcode = request.args.get("zipcode")
-    zipcode = zcdb[zipcode]
-       
-    return render_template("show_city_info.html", zipcode=zipcode)
+@app.route("/show_city")
+def show_city_images():
+   # import pdb; pdb.set_trace()
+
+    input_string = request.args.get("zipcode")
+
+    if find_zipcode_from_input(input_string):
+            
+        images = get_city_images()
+        zipcodeObject = get_global_zipcodeObject()
+        city = zipcodeObject.city
+        state = zipcodeObject.state
+    else:
+        redirect("/")
+
+    return render_template("show_city_info.html", city=city, state=state, images=images)
 
 
-@app.route("/show_city/<int:zipcode>")
-def show_city_images(zipcode):
-    zipcode = zcdb[zipcode]
-    lat = zipcode.latitude
-    lon = zipcode.longitude
-    min_lat = float(lat) - 0.01
-    min_lon = float(lon) - 0.01
-    max_lat = float(lat) + 0.01
-    max_lon = float(lon) + 0.01
-    print "LATITUDE ", lat
-    print "LONGITUDE!!!!!!!!!!", lon
-    resp = requests.get(
-        "http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=10&minx=%s&miny=%s&maxx=%s&maxy=%s&size=medium&mapfilter=true"
-        % (min_lon, min_lat, max_lon, max_lat))
-    resp = resp.json()
-    photos = resp['photos']
-    photoUrls = []
-    images = []
-    for photo in photos:
-        url = photo['photo_url']
-        photoUrls.append(url)
-        page = urllib2.urlopen(url).read()
-        soup = BeautifulSoup(page, "html.parser")
-        image = soup.find(id="main-photo_photo", src=True)
-        images.append(image)
-        #print "Image is here!!!!!!!!!!!!", image
+@app.route("/add-to-favorites", methods=["POST"])
+def add_to_favorites():
+    city = request.form.get("id")
 
-    #print "These are the url_list !!!!!!!!!!!!!", photoUrls
-    return render_template("show_map.html", images=images)
+    # put this in a "favorites" table?
+    # favorite
+
+    return jsonify(status="success", id=city)
 
 
-@app.route("/show_school/<int:zipcode>")
-def show_school_ratings(zipcode):
-    """Returns up to 200 schools within 5 miles of ZIP Code 94105 in California"""
-    #api_key = "x6qgjcxx3xltlqmxlx3mxqxx"
-    zipcode = zcdb[zipcode]
-    # latitude = zipcode.latitude
-    # longitude = zipcode.longitude
-    #city = zipcode.city
-    state = zipcode.state
-    zip1 = zipcode.zip
 
-    #Api call to get school information
-    resp = requests.get("http://api.greatschools.org/schools/nearby?key=%s&state=%s&zip=%s" % (API_KEY_GS, state, zip1))
-      
-    resp = resp.text
+
+@app.route("/show_school")
+def show_school_ratings():
+    """Returns up to 200 schools within 5 miles of zipcode"""
     
-    #Parse the api response string using xml_dom
-    xml_dom = parseString(resp)
-
-    #Get a list of objects with tagname school
-    xml_school_list = xml_dom.getElementsByTagName('school')
-    
-    node_dict = {}
-    
-    #create empty school object list
-    schoolObjects = []
-
-    for xmlSchool in xml_school_list:
-        sChildNodes = xmlSchool.childNodes
-           
-        for childnode in sChildNodes:
-            name = childnode.nodeName
-            if childnode.hasChildNodes():
-                node_dict[name] = childnode.childNodes[0].toxml()           
-            else:
-                node_dict[name] = childnode.toxml()
-
-        #Temporary school object for each school         
-        tempSchoolObject = School(gsid=node_dict.get("gsId"), name=node_dict.get("name"), schoolType=node_dict.get("type"),
-                                  gradeRange=node_dict.get("gradeRange"), city=node_dict.get("city"),
-                                  state=node_dict.get("state"), address=node_dict.get("address"),
-                                  phone=node_dict.get("phone"), website=node_dict.get("website"),
-                                  latitude=node_dict.get("lat"), longitude=node_dict.get("lon"),
-                                  parentRating=node_dict.get("parentRating"),
-                                  overviewLink=node_dict.get("overviewLink"), 
-                                  ratingsLink=node_dict.get("ratingsLink"),
-                                  reviewsLink=node_dict.get("reviewsLink"))
-    
-        schoolObjects.append(tempSchoolObject)
+    schoolObjects = get_schools()
             
     return render_template("school_details.html", schoolObjects=schoolObjects)
 
-    # """ FIX ME. Try later if u have more time"""
-    #     # API call to get profile for each school 
-    #     # xml_SchoolProfile = requests.get(
-    #     #     "http://api.greatschools.org/schools/%s/%s?key=%s" 
-    #     #     % (state, gsid, API_KEY_GS))       
-
-
-def find_nearest_city(zipcode):
-    """finds the nearest big city for the user city
-       to find cost of living
-    """
     
-    from geopy.distance import vincenty
-    zipcode = zcdb[zipcode]
-    myCity = zipcode.city
-    #myState = zipcode.state
-    myCitylat = zipcode.latitude
-    myCitylon = zipcode.longitude
-    
-    #stores all city objects in US 
-    cityObjects = []
-
-    # get all cities from numbeo api call 
-    resp = requests.get("http://numbeo.com/api/cities?api_key="+API_KEY_NUMBEO)
-   
-    resp = resp.json()
-
-    for city_dict in resp.values()[0]:
-        # get cities from US only
-        if city_dict['country'] == 'United States':  
-            cityObjects.append(city_dict)
-
-    nearestCityObject = None
-    nearestDistance = 1000
-
-    #city for the zipcode that user entered
-    myCity = (myCitylat, myCitylon)
-
-    for cityObject in cityObjects:
-
-        #city lat and long from citiobject that we are comapring
-        isNearCity = (cityObject['latitude'], cityObject['longitude']) 
-        
-        #geopy function vincenty to calculate the distance
-        distance = vincenty(myCity, isNearCity).miles  
-        if distance < nearestDistance:
-            nearestDistance = distance
-            nearestCityObject = cityObject
-
-    #print nearestCityObject      
-
-    return nearestCityObject
 
 
-@app.route("/cost_of_living/<int:zipcode>")
-def show_cost_of_living(zipcode):
+@app.route("/cost_of_living/")
+def show_cost_of_living():
     """calculate cost of living for city"""
     #import pdb; pdb.set_trace()
-    city = find_nearest_city(int(zipcode))
-    print "This is city object!!!!!!!", city
+
+    city = find_nearest_city()
+  
     resp = requests.get("http://numbeo.com/api/city_prices?api_key=%s&city_id=%s" % (API_KEY_NUMBEO, city['city_id']))
     resp = resp.json()
     prices = resp['prices']
+    #keys = ['item_id', u'item_name', u'average_price', u'lowest_price', u'highest_price']
+    resp_indexes = requests.get("http://numbeo.com/api/indices?api_key=%s&city_id=%s" % (API_KEY_NUMBEO, city['city_id']))
+    resp_indexes = resp_indexes.json()
 
-    return render_template("cost_of_living.html", prices)
+    return render_template("cost_of_living.html", prices=prices, indexes=resp_indexes)
 
 
-@app.route("/crime_rate/<int:zipcode>")
-def show_crime_rate(zipcode):
+
+@app.route("/crime_rate")
+def show_crime_rate():
     """show crime rate for the city"""
-    #import pdb; pdb.set_trace()
-    city = find_nearest_city(zipcode)
+    
+    city = find_nearest_city()
     resp = requests.get("http://numbeo.com//api/city_crime?api_key=%s&city_id=%s" % (API_KEY_NUMBEO, city['city_id']))
     crime_data = resp.json()
 
     return render_template("crime_rate.html", crime_data=crime_data)
+
+
+
+
+@app.route('/register', methods=['GET'])
+def register_form():
+    """Show form for user signup."""
+
+    return render_template("register_form.html")
+
+
+@app.route('/register', methods=['POST'])
+def register_process():
+    """Process registration."""
+
+    # Get form variables
+    email = request.form["email"]
+    password = request.form["password"]
+    #age = int(request.form["age"])
+    zipcode = request.form["zipcode"]
+
+    new_user = User(email=email, password=password, zipcode=zipcode)
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    flash("User %s added." % email)
+    return redirect("/")
+
+
+@app.route('/login', methods=['GET'])
+def login_form():
+    """Show login form."""
+
+    return render_template("login_form.html")
+
+
+@app.route('/login', methods=['POST'])
+def login_process():
+    """Process login."""
+
+    # Get form variables
+    email = request.form["email"]
+    password = request.form["password"]
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        flash("You are not registered. Please register and then Login")
+        return render_template("register_form.html")
+
+    if user.password != password:
+        flash("Incorrect password")
+        return redirect("/login")
+
+    session["user_id"] = user.user_id
+
+    flash("You are now Logged in")
+    return redirect("/")
+
+
+@app.route('/logout')
+def logout():
+    """Log out."""
+
+    del session["user_id"]
+    flash("Logged Out.")
+    return redirect("/")
 
 
 
