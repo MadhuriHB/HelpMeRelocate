@@ -77,26 +77,25 @@ def get_city_summary():
 
     global ZIPCODE
     city = ZIPCODE.city
+    state = ZIPCODE.state
    
-    page = wikipedia.page(city)
+    page = wikipedia.page(city + " " + state)
 
     summary = page.summary
 
     climate = page.section("Climate")
-
+    return [summary, climate]
     
-
 
 
 def get_school_rating(tempSchoolObject):
 
     #from django.utils.encoding import smart_str, smart_unicode
     #putting resp in smart_str from django also works but .format.encode used below is the easy way
-
-    import pdb; pdb.set_trace()
-    resp = requests.get("http://api.greatschools.org/school/tests/%s/%s?key=%s" % (tempSchoolObject.state,
-                                                                                                 tempSchoolObject.gsid,
-                                                                                                 API_KEY_GS))  
+    state = tempSchoolObject.state
+    gsid = tempSchoolObject.gsid
+    #import pdb; pdb.set_trace()
+    resp = requests.get("http://api.greatschools.org/school/tests/%s/%s?key=%s" % (state, gsid, API_KEY_GS))  
     resp = resp.text
 
     #resp.encode('ascii', 'ignore')
@@ -106,9 +105,20 @@ def get_school_rating(tempSchoolObject):
     xml_school_list = xml_dom.getElementsByTagName('testResults')
     node_dict = {}
     #xml_school_list[0].childNodes[1].childNodes[4].toxml()
-    xml_school_object = xml_school_list[0]
-    score = xml_school_object.childNodes[1].childNodes[4].toxml()
-    tempSchoolObject['score'] = score 
+    for xmlSchool in xml_school_list:
+        sChildNodes = xmlSchool.childNodes
+           
+        for childnode in sChildNodes:
+            name = childnode.nodeName
+            if childnode.hasChildNodes():
+                node_dict[name] = childnode.childNodes[0].toxml()           
+            else:
+                node_dict[name] = childnode.toxml()
+
+    tempSchoolObject.score = node_dict.get("score")
+
+    #score = xml_school_object.childNodes[1].childNodes[4].toxml()
+    #tempSchoolObject['score'] = score 
        
     return tempSchoolObject
 
@@ -163,10 +173,7 @@ def get_schools():
         
         # write a separate function for this and call it here
 
-        tempSchoolObject1 = get_school_rating(tempSchoolObject)
-        
-
-
+        tempSchoolObject1 = get_school_rating(tempSchoolObject)     
         schoolObjects.append(tempSchoolObject1)
     return schoolObjects 
 

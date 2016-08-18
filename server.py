@@ -11,10 +11,12 @@ from pyzipcode import ZipCodeDatabase
 
 
 from helper import get_global_zipcodeObject, find_zipcode_from_input, get_city_images, get_schools
-from helper import find_nearest_city
+from helper import find_nearest_city, get_city_summary
 
 import requests
 import os
+
+import model
 
 
 app = Flask(__name__)
@@ -45,15 +47,18 @@ def show_city_images():
     input_string = request.args.get("zipcode")
 
     if find_zipcode_from_input(input_string):
-            
-        images = get_city_images()
+        
+        #call function from helper to get images    
+        images = get_city_images()                 
         zipcodeObject = get_global_zipcodeObject()
         city = zipcodeObject.city
         state = zipcodeObject.state
+        #call function from helper to get summary
+        summary, climate = get_city_summary()
     else:
         redirect("/")
 
-    return render_template("show_city_info.html", city=city, state=state, images=images)
+    return render_template("show_city_info.html", city=city, state=state, images=images, summary=summary, climate=climate)
 
 
 @app.route("/add-to-favorites", methods=["POST"])
@@ -62,6 +67,7 @@ def add_to_favorites():
 
     # put this in a "favorites" table?
     # favorite
+    favorite = Favorites()
 
     return jsonify(status="success", id=city)
 
@@ -73,7 +79,7 @@ def show_school_ratings():
     """Returns up to 200 schools within 5 miles of zipcode"""
     
     schoolObjects = get_schools()
-            
+    
     return render_template("school_details.html", schoolObjects=schoolObjects)
 
     

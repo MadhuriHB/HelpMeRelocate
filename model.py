@@ -11,14 +11,10 @@ db = SQLAlchemy()
 class Neighborhood(db.Model):
     """ Neighborhood information"""
 
-    __tablename__ = "neighborhood"
+    __tablename__ = "neighborhoods"
     
-    neighborhood_id = db.Column(db.String(10), primary_key=True, nullable=False)
-    #neighborhood_image = 
-
-    #map
-    #image
-
+    neighborhood_id = db.Column(db.Integer, primary_key=True, nullable=False)
+   
 
 
 class School(db.Model):
@@ -53,26 +49,36 @@ class School(db.Model):
 
 class CostOfLiving(db.Model):
     """ Cost of living index and price list for each city"""
-#one to one relationship with Neighborhood
-    __tablename__ = "costOfLiving"
+    #one to one relationship with Neighborhood
+    __tablename__ = "cost_of_living"
+
+    cost_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+
+    neighborhood_id = db.Column(db.Integer, db.ForeignKey(Neighborhood.neighborhood_id), nullable=False)
 
 
-    neighborhood = db.relationship("Neighborhood", db.backref("costOfLiving", uselist=False))
+    #neighborhood = db.relationship("Neighborhood", db.backref("costOfLiving", uselist=False))
 
 
 class PriceList(db.Model):
     """ Average price list """
 # one to many relationship with Neighborhood
 
-    __tablename__ = "priceList"
-    neighborhood = db.relationship("Neighborhood", backref="priceList")
+    __tablename__ = "price_list"
+
+    price_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    neighborhood_id = db.Column(db.Integer, db.ForeignKey(Neighborhood.neighborhood_id), nullable=False)
+
+   
+    neighborhood = db.relationship("Neighborhood", backref="price_list")
 
 
 class Crime(db.Model):
     """crime index """
 # one to one relationship with Neighborhood    
-    __tablename__ = "crimeRate"
+    __tablename__ = "crime_rate"
 
+    crime_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     crime_increasing = db.Column(db.String(20), nullable=True)
     contributors = db.Column(db.String(20), nullable=True) 
     city_id = db.Column(db.String(20), nullable=True) 
@@ -97,13 +103,13 @@ class Crime(db.Model):
     worried_car_stolen = db.Column(db.String(20), nullable=True) 
 
     neighborhood_id = db.Column(db.Integer, db.ForeignKey(Neighborhood.neighborhood_id), nullable=False)
-    neighborhood = db.relationship("Neighborhood", db.backref("crime_rate", uselist=False))
-
+    #neighborhood = db.relationship("Neighborhood", db.backref("crime_rate", uselist=False))
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<Crime city=%s crime_index=%s safety_index=%s>" % (self.name, self.index_crime, self.index_safety)
+
 
 class User(db.Model):
     """User sign in details"""
@@ -112,9 +118,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(64), nullable=True)
     password = db.Column(db.String(64), nullable=False)
-    age = db.Column(db.Integer, nullable=True)
-    zipcode = db.Column(db.String(15), nullable=False)
-
+    
     def __repr__(self):
         """Provide helpful representation when printed."""
 
@@ -129,7 +133,7 @@ class Favorites(db.Model):
                         db.ForeignKey(User.user_id),
                         nullable=False)
     neighborhood_id = db.Column(db.Integer,
-                                db.ForeignKey('neighborhood.neighborhood_id'),
+                                db.ForeignKey(Neighborhood.neighborhood_id),
                                 nullable=False)
 
     def __repr__(self):
@@ -143,7 +147,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our PostgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///relocation'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///relocate'
     app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)

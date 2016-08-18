@@ -11,10 +11,22 @@
     {% endfor %}
     <br><br>
     City name is {{ city }}. <br>
-    State name is {{ state }}   
-    <a href="/show_school">Show schools</a> <br>
-    <a href="/cost_of_living">Show Cost of Living</a><br>
-    <a href="/crime_rate">Show crime rate </a><br>
+    State name is {{ state }} <br><br>  
+    
+
+    <a href="/show_school"><h3>Show schools</h3></a> <br>
+    <a href="/cost_of_living"><h3>Show Cost of Living</h3></a><br>
+    <a href="/crime_rate"><h3>Show crime rate </h3></a><br>
+    
+
+    <h2>About the city >></h2> 
+    <p>{{ summary }}</p> <br><br><br>
+    
+    <h2>Climate >></h2>
+    <p>{{ climate }}</p>
+
+
+
     <script type="text/javascript">
 
         $(function () { // this is the jquery shortcut for document.ready()
