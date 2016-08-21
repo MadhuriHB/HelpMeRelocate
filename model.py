@@ -1,5 +1,5 @@
-import heapq
-import time
+# import heapq
+# import time
 from flask_sqlalchemy import SQLAlchemy
 
 # This is the connection to the PostgreSQL database; we're getting this through
@@ -8,31 +8,50 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 class Neighborhood(db.Model):
     """ Neighborhood information"""
 
     __tablename__ = "neighborhoods"
     
     neighborhood_id = db.Column(db.Integer, primary_key=True, nullable=False)
-   
+    city = db.Column(db.String(50))    
+    state = db.Column(db.String(50))
+    summary = db.Column(db.Text, nullable=True)
+    climate = db.Column(db.Text, nullable=True)
+
+    crime = db.relationship("Crime")
+    images = db.relationship("Images")
+
+
+class Images(db.Model):
+    """save image urls"""
+    __tablename__ = "images"
+
+    image_id = db.Column(db.Integer, autoincrement=True, primary_key=True, nullable=False)
+    image_url = db.Column(db.Text, nullable=True)
+    neighborhood_id = db.Column(db.Integer, db.ForeignKey(Neighborhood.neighborhood_id), nullable=False)
+
+    neighborhood = db.relationship("Neighborhood")
 
 
 class School(db.Model):
     """User sign in details"""
     __tablename__ = "schools"
 
-    gsid = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
-    schoolType = db.Column(db.String(64), nullable=True)
-    gradeRange = db.Column(db.String(64), nullable=True)
+    gsid = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    score = db.Column(db.Float, nullable=True)
+    schoolType = db.Column(db.String(200), nullable=True)
+    gradeRange = db.Column(db.String(200), nullable=True)
     parentRating = db.Column(db.String(15), nullable=True)
-    city = db.Column(db.String(15), nullable=False)
-    state = db.Column(db.String(64), nullable=False)
+    city = db.Column(db.String(100), nullable=False)
+    state = db.Column(db.String(100), nullable=False)
     address = db.Column(db.Text, nullable=False)
-    phone = db.Column(db.String(64), nullable=False)
+    phone = db.Column(db.String(100), nullable=False)
     website = db.Column(db.Text, nullable=True)
-    latitude = db.Column(db.String(64), nullable=False)
-    longitude = db.Column(db.String(64), nullable=False)
+    latitude = db.Column(db.String(100), nullable=False)
+    longitude = db.Column(db.String(100), nullable=False)
     overviewLink = db.Column(db.Text, nullable=True)
     ratingsLink = db.Column(db.Text, nullable=True)
     reviewsLink = db.Column(db.Text, nullable=True)
@@ -44,7 +63,7 @@ class School(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<School gs_id=%s zipcode=%s name=%s>" % (self.gs_id, self.zipcode, self.name)
+        return "<School gsid=%s city=%s name=%s>" % (self.gsid, self.city, self.name)
 
 
 class CostOfLiving(db.Model):
@@ -55,22 +74,41 @@ class CostOfLiving(db.Model):
     cost_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
     neighborhood_id = db.Column(db.Integer, db.ForeignKey(Neighborhood.neighborhood_id), nullable=False)
+    pollution_index = db.Column(db.String(20), nullable=True)
+    traffic_time_index = db.Column(db.String(20), nullable=True)
+    groceries_index = db.Column(db.String(20), nullable=True)
+    hotel_price_index = db.Column(db.String(20), nullable=True)
+    cpi_index = db.Column(db.String(20), nullable=True)
+    restaurant_price_index = db.Column(db.String(20), nullable=True)
+    property_price_to_income_ratio = db.Column(db.String(20), nullable=True)
+    health_care_index = db.Column(db.String(20), nullable=True)
+    safety_index = db.Column(db.String(20), nullable=True)
+    crime_index = db.Column(db.String(20), nullable=True)
+    cpi_and_rent_index = db.Column(db.String(20), nullable=True)
+    rent_index = db.Column(db.String(20), nullable=True)
+    traffic_inefficiency_index = db.Column(db.String(20), nullable=True)
+    purchasing_power_incl_rent_index = db.Column(db.String(20), nullable=True)
+    raffic_co2_index = db.Column(db.String(20), nullable=True)
+    traffic_index = db.Column(db.String(20), nullable=True)
+
+    neighborhood = db.relationship("Neighborhood", uselist=False, backref="cost_of_living")
 
 
-    #neighborhood = db.relationship("Neighborhood", db.backref("costOfLiving", uselist=False))
-
-
-class PriceList(db.Model):
+class PriceItems(db.Model):
     """ Average price list """
 # one to many relationship with Neighborhood
 
-    __tablename__ = "price_list"
+    __tablename__ = "price_items"
 
     price_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    neighborhood_id = db.Column(db.Integer, db.ForeignKey(Neighborhood.neighborhood_id), nullable=False)
-
+    cost_id = db.Column(db.Integer, db.ForeignKey(CostOfLiving.cost_id), nullable=False)
+    item_id = db.Column(db.Integer)
+    item_name = db.Column(db.Text, nullable=True)
+    average_price = db.Column(db.String(20), nullable=True)
+    lowest_price = db.Column(db.String(20), nullable=True)
+    highest_price = db.Column(db.String(20), nullable=True)
    
-    neighborhood = db.relationship("Neighborhood", backref="price_list")
+    cost_of_living = db.relationship("CostOfLiving", backref="price_list")
 
 
 class Crime(db.Model):
@@ -79,31 +117,32 @@ class Crime(db.Model):
     __tablename__ = "crime_rate"
 
     crime_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    crime_increasing = db.Column(db.String(20), nullable=True)
-    contributors = db.Column(db.String(20), nullable=True) 
-    city_id = db.Column(db.String(20), nullable=True) 
-    worried_mugged_robbed = db.Column(db.String(20), nullable=True)  
-    worried_home_broken = db.Column(db.String(20), nullable=True) 
-    problem_property_crimes = db.Column(db.String(20), nullable=True)  
-    worried_things_car_stolen = db.Column(db.String(20), nullable=True) 
-    level_of_crime = db.Column(db.String(20), nullable=True) 
-    worried_insulted = db.Column(db.String(20), nullable=True) 
-    problem_drugs = db.Column(db.String(20), nullable=True) 
-    worried_attacked = db.Column(db.String(20), nullable=True) 
-    problem_violent_crimes = db.Column(db.String(20), nullable=True) 
-    worried_skin_ethnic_religion = db.Column(db.String(20), nullable=True) 
-    safe_alone_night = db.Column(db.String(20), nullable=True) 
-    safe_alone_daylight = db.Column(db.String(20), nullable=True) 
-    yearLastUpdate = db.Column(db.String(20), nullable=True) 
-    index_crime = db.Column(db.String(20), nullable=True) 
-    name = db.Column(db.String(20), nullable=True) 
-    monthLastUpdate = db.Column(db.String(20), nullable=True) 
-    problem_corruption_bribery = db.Column(db.String(20), nullable=True) 
-    index_safety = db.Column(db.String(20), nullable=True) 
-    worried_car_stolen = db.Column(db.String(20), nullable=True) 
+    crime_increasing = db.Column(db.String(120), nullable=True)
+    contributors = db.Column(db.String(120), nullable=True) 
+    city_id = db.Column(db.String(120), nullable=True) 
+    worried_mugged_robbed = db.Column(db.String(120), nullable=True)  
+    worried_home_broken = db.Column(db.String(120), nullable=True) 
+    problem_property_crimes = db.Column(db.String(120), nullable=True)  
+    worried_things_car_stolen = db.Column(db.String(120), nullable=True) 
+    level_of_crime = db.Column(db.String(120), nullable=True) 
+    worried_insulted = db.Column(db.String(120), nullable=True) 
+    problem_drugs = db.Column(db.String(120), nullable=True) 
+    worried_attacked = db.Column(db.String(120), nullable=True) 
+    problem_violent_crimes = db.Column(db.String(120), nullable=True) 
+    worried_skin_ethnic_religion = db.Column(db.String(120), nullable=True) 
+    safe_alone_night = db.Column(db.String(120), nullable=True) 
+    safe_alone_daylight = db.Column(db.String(120), nullable=True) 
+    yearLastUpdate = db.Column(db.String(100), nullable=True) 
+    index_crime = db.Column(db.String(100), nullable=True) 
+    name = db.Column(db.String(100), nullable=True) 
+    monthLastUpdate = db.Column(db.String(100), nullable=True) 
+    problem_corruption_bribery = db.Column(db.String(100), nullable=True) 
+    index_safety = db.Column(db.String(100), nullable=True) 
+    worried_car_stolen = db.Column(db.String(100), nullable=True) 
 
     neighborhood_id = db.Column(db.Integer, db.ForeignKey(Neighborhood.neighborhood_id), nullable=False)
-    #neighborhood = db.relationship("Neighborhood", db.backref("crime_rate", uselist=False))
+
+    neighborhood = db.relationship("Neighborhood")
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -116,8 +155,13 @@ class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(64), nullable=True)
+    email = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(64), nullable=False)
+    zipcode = db.Column(db.Integer, nullable=False)
+
+    favorite = db.relationship("Neighborhood",
+                               secondary="favorites",
+                               backref="user")
     
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -128,13 +172,17 @@ class User(db.Model):
 class Favorites(db.Model):
     """ specific user's Favorite neighborhoods"""
    #Association table between User and Neighborhood  
-    fav_id = db.Column(db.Integer, primary_key=True)
+    fav_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer,
                         db.ForeignKey(User.user_id),
                         nullable=False)
+   
     neighborhood_id = db.Column(db.Integer,
                                 db.ForeignKey(Neighborhood.neighborhood_id),
                                 nullable=False)
+ 
+    user = db.relationship("User", backref="favorites")
+    neighborhood = db.relationship("Neighborhood", backref="favorites")
 
     def __repr__(self):
         return "<Favorites neighborhood_id=%s user_id=%s >" % (self.neighborhood_id, self.user_id)

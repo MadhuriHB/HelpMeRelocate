@@ -1,41 +1,42 @@
 ZIPCODE = None
 
 from pyzipcode import ZipCodeDatabase
-
+import bs4
 import urllib2
 from bs4 import BeautifulSoup
 from model import connect_to_db, db, School
 from xml.dom.minidom import parse, parseString
 import requests
 import os
-
+from model import Images
 #API_KEY = os.environ.get("API_KEY")
 API_KEY_GS = os.environ.get("api_key_gs")
 API_KEY_NUMBEO = os.environ.get("API_KEY_NUMBEO")
 
 
-
-
 def get_global_zipcodeObject():
     return ZIPCODE 
 
+
 def find_zipcode_from_input(input_string):
+    
     global ZIPCODE
     ZIPCODE = None
 
     zcdb = ZipCodeDatabase() 
+
     input_string.strip()
     if input_string.isnumeric():
         ZIPCODE = zcdb[input_string]
 
     else:
-        zipcodeList = zcdb.find_zip(city=input_string)
+        zipcodeList = zcdb.find_zip(input_string)
         if zipcodeList is not None and len(zipcodeList) >= 1:
             ZIPCODE = zipcodeList[0]
         else: 
-            return False
+            return None
     #print "This is ZIPCODE", ZIPCODE.zip
-    return True
+    return ZIPCODE
 
 
 def get_city_images():
@@ -45,7 +46,7 @@ def get_city_images():
     #print "This is ZIPCODE in IMAGES ", ZIPCODE.zip
     lat = ZIPCODE.latitude
     lon = ZIPCODE.longitude
-
+   
     min_lat = float(lat) - 0.01
     min_lon = float(lon) - 0.01
     max_lat = float(lat) + 0.01
@@ -60,19 +61,20 @@ def get_city_images():
     photoUrls = []
     
     for photo in photos:
-        url = photo['photo_url']
+        url = photo['photo_url']       
         photoUrls.append(url)
         page = urllib2.urlopen(url).read()
         soup = BeautifulSoup(page, "html.parser")
         image = soup.find(id="main-photo_photo", src=True)
         images.append(image)
-    
+
     return images
+
 
 def get_city_summary():
     """ get summary and climate from wikipedia """
 
-    # Wikipedia is a wrapper for wikipedia API 
+    # Wikipedia is a wrapper on wikipedia API 
     import wikipedia
 
     global ZIPCODE
@@ -84,52 +86,47 @@ def get_city_summary():
     summary = page.summary
 
     climate = page.section("Climate")
+
     return [summary, climate]
     
 
-
 def get_school_rating(tempSchoolObject):
-
+    #import pdb; pdb.set_trace()
     #from django.utils.encoding import smart_str, smart_unicode
     #putting resp in smart_str from django also works but .format.encode used below is the easy way
+    
     state = tempSchoolObject.state
     gsid = tempSchoolObject.gsid
+    
     #import pdb; pdb.set_trace()
+    
     resp = requests.get("http://api.greatschools.org/school/tests/%s/%s?key=%s" % (state, gsid, API_KEY_GS))  
+    #resp = resp.text
     resp = resp.text
-
-    #resp.encode('ascii', 'ignore')
-
     #Parse the api response string using xml_dom
+    
     xml_dom = parseString(u'{}'.format(resp).encode('utf-8'))
-    xml_school_list = xml_dom.getElementsByTagName('testResults')
-    node_dict = {}
-    #xml_school_list[0].childNodes[1].childNodes[4].toxml()
-    for xmlSchool in xml_school_list:
-        sChildNodes = xmlSchool.childNodes
-           
-        for childnode in sChildNodes:
-            name = childnode.nodeName
-            if childnode.hasChildNodes():
-                node_dict[name] = childnode.childNodes[0].toxml()           
+
+    #xml_dom = parseString(smart_str(resp))
+
+    rank_Elements = xml_dom.getElementsByTagName("rank")
+    rank_Element = rank_Elements[0]
+    # check if element is not None before using
+    if rank_Element: 
+        rank_children = rank_Element.childNodes
+        for rank_child in rank_children:
+            if rank_child.nodeName == "score":
+                score = rank_child.firstChild.data
+                tempSchoolObject.score = score 
             else:
-                node_dict[name] = childnode.toxml()
-
-    tempSchoolObject.score = node_dict.get("score")
-
-    #score = xml_school_object.childNodes[1].childNodes[4].toxml()
-    #tempSchoolObject['score'] = score 
-       
+                tempSchoolObject.score = None
     return tempSchoolObject
-
-
-
-
-
 
 
 def get_schools():
     #get schools for the zipcode
+    #from django.utils.encoding import smart_str, smart_unicode
+    #import pdb; pdb.set_trace()
     global ZIPCODE
     state = ZIPCODE.state
     zipcode = ZIPCODE.zip
@@ -137,10 +134,14 @@ def get_schools():
     resp = requests.get("http://api.greatschools.org/schools/nearby?key=%s&state=%s&zip=%s" % (API_KEY_GS, state, zipcode))
     
     resp = resp.text
-    
+    f = open("xmlData.txt", "w")
+    f.write(resp)
+    f.close()
+
     #Parse the api response string using xml_dom
     #Make the resp accept the unicode characters
     xml_dom = parseString(u'{}'.format(resp).encode('utf-8'))
+    #xml_dom = parseString(smart_str(resp))
 
     #Get a list of objects with tagname school
     xml_school_list = xml_dom.getElementsByTagName('school')
@@ -171,12 +172,12 @@ def get_schools():
                                   ratingsLink=node_dict.get("ratingsLink"),
                                   reviewsLink=node_dict.get("reviewsLink"))
         
-        # write a separate function for this and call it here
+        # call function to get great school rating for each school
 
         tempSchoolObject1 = get_school_rating(tempSchoolObject)     
         schoolObjects.append(tempSchoolObject1)
+    
     return schoolObjects 
-
 
 
 def find_nearest_city():
@@ -188,7 +189,6 @@ def find_nearest_city():
     ZIPCODE = get_global_zipcodeObject()
     from geopy.distance import vincenty
     
-   
     myCitylat = ZIPCODE.latitude
     myCitylon = ZIPCODE.longitude
     
@@ -221,6 +221,14 @@ def find_nearest_city():
         if distance < nearestDistance:
             nearestDistance = distance
             nearestCityObject = cityObject
-
    
     return nearestCityObject
+
+
+def row2dict(row):
+    dictionary = {}
+    for column in row.__table__.columns:
+        dictionary[column.name] = str(getattr(row, column.name))
+
+    return dictionary
+
