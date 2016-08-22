@@ -1,23 +1,21 @@
 """Help me Relocate"""
 from jinja2 import StrictUndefined
-from sqlalchemy import func
+#from sqlalchemy import func
 
 from flask import Flask, render_template, request, redirect, flash, session, jsonify
 
 from flask_debugtoolbar import DebugToolbarExtension
-from xml.dom.minidom import parse, parseString
+#from xml.dom.minidom import parse, parseString
 
 from model import connect_to_db, db, School, User, Neighborhood, Images, CostOfLiving, PriceItems, Crime, Favorites 
 from pyzipcode import ZipCodeDatabase
 
 
 from helper import get_global_zipcodeObject, find_zipcode_from_input, get_city_images, get_schools, row2dict 
-from helper import find_nearest_city, get_city_summary
+from helper import find_nearest_city, get_city_summary, hash_password
 
 import requests
 import os
-
-
 
 
 app = Flask(__name__)
@@ -29,6 +27,7 @@ zcdb = ZipCodeDatabase()
 # Normally, if you use an undefined variable in Jinja2, it fails silently.
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
+
 API_KEY = os.environ.get("API_KEY")
 API_KEY_GS = os.environ.get("api_key_gs")
 API_KEY_NUMBEO = os.environ.get("API_KEY_NUMBEO")
@@ -42,7 +41,7 @@ def index():
 
 @app.route("/show_city")
 def show_city_data():
-    #import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
 
     input_string = request.args.get("zipcode")
 
@@ -53,7 +52,9 @@ def show_city_data():
         #check if neighborhood is already in DB 
         if is_neighborhood_in_db is None:
             #call function from helper to get images    
-            images = get_city_images()                    
+            images = get_city_images()  
+            image_urls = [image['src'] for image in images]
+            
             zipcodeObject = get_global_zipcodeObject()
             city = zipcodeObject.city
             state = zipcodeObject.state
@@ -79,23 +80,26 @@ def show_city_data():
             summary = neighborhood.summary
             climate = neighborhood.climate
             images = Images.query.filter_by(neighborhood_id=zipcode).all()
-    
+            image_urls = [image.image_url for image in images]
+            
     else:
         redirect("/")
 
-    return render_template("show_city_info.html", city=city, state=state, images=images, summary=summary, climate=climate)
+    return render_template("show_city_info.html", city=city, state=state, images=image_urls, summary=summary, climate=climate)
 
 
 @app.route("/add-to-favorites", methods=["POST"])
 def add_to_favorites():
     #import pdb; pdb.set_trace()
     iD = request.form.get("id")
+
     #check if user is logged in 
     if 'user_id' in session.keys(): 
         user_id = session["user_id"] 
         ZIPCODE = get_global_zipcodeObject()
         zipcode = ZIPCODE.zip
         city = ZIPCODE.city
+       
         #check to see if favorite is already in DB
         is_fav_in_db = Favorites.query.filter_by(neighborhood_id=zipcode).first()
         
@@ -255,11 +259,11 @@ def register_process():
     # Get form variables
     email = request.form.get("email")
     password = request.form.get("password")
-   
+    password_hashed = hash_password(password)
     zipcode = request.form.get("zipcode")
     zipcode = int(zipcode)
 
-    new_user = User(email=email, password=password, zipcode=zipcode)
+    new_user = User(email=email, password=password_hashed, zipcode=zipcode)
 
     db.session.add(new_user)
     db.session.commit()
@@ -289,7 +293,7 @@ def login_process():
         flash("You are not registered. Please register and then Login")
         return render_template("register_form.html")
 
-    if user.password != password:
+    if user.password != hash_password(password):
         flash("Incorrect password")
         return redirect("/login")
 
@@ -307,7 +311,7 @@ def logout():
     flash("Logged Out.")
     return redirect("/")
 
-    
+
 if __name__ == "__main__":
 
     # We have to set debug=True here, since it has to be True at the point

@@ -4,12 +4,12 @@
      <div>
             <button id='favorite' class="favorite-btn">&hearts;Favorite </button>
     </div>
-    <!-- <a data-id=${Id} onclick="ConfirmDelete(this)" ><span class="glyphicon glyphicon-trash"></span></a> -->
    
         
     {% for image in images %}
-        <img src= {{ image.image_url }} alt="city-Images" style="width:304px;height:228px;">
+        <img src={{ image }} style="width:304px;height:228px;">
     {% endfor %}
+    
     <br><br>
     City name is {{ city }}. <br>
     State name is {{ state }} <br><br>  
@@ -22,6 +22,7 @@
 
     <h2>About the city >></h2> <br>
     <p>{{ summary }}</p> <br><br><br>
+    
     {% if climate is not none %}
         <h2>Climate >></h2> <br>
         <p>{{ climate }}</p>

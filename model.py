@@ -39,7 +39,8 @@ class School(db.Model):
     """User sign in details"""
     __tablename__ = "schools"
 
-    gsid = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    gsid = db.Column(db.Integer)
     name = db.Column(db.String(200), nullable=False)
     score = db.Column(db.Float, nullable=True)
     schoolType = db.Column(db.String(200), nullable=True)

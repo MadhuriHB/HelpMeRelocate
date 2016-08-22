@@ -134,9 +134,7 @@ def get_schools():
     resp = requests.get("http://api.greatschools.org/schools/nearby?key=%s&state=%s&zip=%s" % (API_KEY_GS, state, zipcode))
     
     resp = resp.text
-    f = open("xmlData.txt", "w")
-    f.write(resp)
-    f.close()
+   
 
     #Parse the api response string using xml_dom
     #Make the resp accept the unicode characters
@@ -231,4 +229,24 @@ def row2dict(row):
         dictionary[column.name] = str(getattr(row, column.name))
 
     return dictionary
+
+
+def hash_password(password):
+    import hashlib
+    hash1 = hashlib.md5(password)
+    hashed = hash1.hexdigest()
+    return hashed
+
+
+
+
+
+
+
+
+
+
+
+
+
 
