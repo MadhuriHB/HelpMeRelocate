@@ -9,6 +9,7 @@ from xml.dom.minidom import parse, parseString
 import requests
 import os
 from model import Images
+from states import get_state_full_name
 #API_KEY = os.environ.get("API_KEY")
 API_KEY_GS = os.environ.get("api_key_gs")
 API_KEY_NUMBEO = os.environ.get("API_KEY_NUMBEO")
@@ -73,20 +74,24 @@ def get_city_images():
 
 def get_city_summary():
     """ get summary and climate from wikipedia """
-
+    #import pdb; pdb.set_trace()
     # Wikipedia is a wrapper on wikipedia API 
     import wikipedia
 
     global ZIPCODE
     city = ZIPCODE.city
-    state = ZIPCODE.state
-   
-    page = wikipedia.page(city + " " + state)
-
-    summary = page.summary
-
-    climate = page.section("Climate")
-
+    state_abbr = ZIPCODE.state
+    state_full_name = get_state_full_name(state_abbr)
+    # page = wikipedia.page(city + " " + state)
+    # summary = page.summary
+    
+    results_tuple = wikipedia.search(city+" "+state_full_name, results=5, suggestion=False)
+    results = results_tuple
+    first_page = results[0]
+    wiki_page = wikipedia.page(first_page)
+    summary = wiki_page.summary
+    climate = wiki_page.section("Climate")
+    
     return [summary, climate]
     
 

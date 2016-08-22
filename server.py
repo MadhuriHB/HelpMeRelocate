@@ -41,7 +41,7 @@ def index():
 
 @app.route("/show_city")
 def show_city_data():
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
 
     input_string = request.args.get("zipcode")
 
