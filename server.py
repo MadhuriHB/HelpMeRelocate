@@ -109,7 +109,7 @@ def add_to_favorites():
             db.session.add(favorite)
             db.session.commit()
             flash("%s %s is addded as your Favorite" % (city, zipcode))
-            return jsonify(status="success", id=iD)
+            return jsonify(id=iD)
 
     return jsonify(status="message", id=iD)
 
@@ -120,6 +120,7 @@ def show_school_details():
     #import pdb; pdb.set_trace()
     ZIPCODE = get_global_zipcodeObject()
     zipcode = ZIPCODE.zip
+    #zip_lat_lon = {'lat': ZIPCODE.latitude, 'lon': ZIPCODE.longitude}
     school = School.query.filter_by(neighborhood_id=zipcode).first()
     if school is None:
         schoolObjects = get_schools()
@@ -130,9 +131,26 @@ def show_school_details():
     else:
         schoolObjects = School.query.filter_by(neighborhood_id=zipcode).all()
     
-    return render_template("school_details.html", schoolObjects=schoolObjects)
+    #return render_template("school_details.html", zip_lat_lon=zip_lat_lon, schoolObjects=schoolObjects)
+    return render_template("schools_on_map.html")
 
+
+@app.route("/school_map_data")
+def show_schools_on_map():
+
+    ZIPCODE = get_global_zipcodeObject()
+    zipcode = ZIPCODE.zip
+    kwargs = {'neighborhood_id': zipcode, 'school_type': 'public'}
+    schoolObjects = School.query.filter_by(**kwargs).all()
+
+    schools_list = [row2dict(schoolObject) for schoolObject in schoolObjects]
     
+    #zipLatLng = {'lat': ZIPCODE.latitude, 'lng': ZIPCODE.longitude}
+    #schools_and_neighborhood = {'zipLatLng': zipLatLng, 'schools': schools}
+    schools = {'schools': schools_list}
+    return jsonify(schools)
+
+
 @app.route("/cost_of_living/")
 def show_cost_of_living():
     """calculate cost of living for city"""
@@ -239,10 +257,44 @@ def show_crime_rate():
         db.session.add(crime_rate)
         db.session.commit()
     else:
-    	crime_data = Crime.query.filter_by(neighborhood_id=zipcode).first()
-    	crime_data = row2dict(crime_data)
+        crime_data = Crime.query.filter_by(neighborhood_id=zipcode).first()
+        crime_data = row2dict(crime_data)
+    	
+    return render_template("crime_rate.html")
 
-    return render_template("crime_rate.html", crime_data=crime_data)
+
+@app.route('/crime-chart-data')
+def give_chart_data():
+    #import pdb; pdb.set_trace()
+    import math
+    ZIPCODE = get_global_zipcodeObject()
+    zipcode = ZIPCODE.zip
+    crime_data = Crime.query.filter_by(neighborhood_id=zipcode).first()
+    crime_data = row2dict(crime_data)
+
+    del crime_data['city_id']
+    del crime_data['neighborhood_id']
+    del crime_data['crime_id']
+    del crime_data['name']
+    del crime_data['yearLastUpdate']
+    del crime_data['monthLastUpdate']
+    del crime_data['index_safety']
+    del crime_data['contributors']
+    del crime_data['index_crime']
+    del crime_data['safe_alone_night']
+    del crime_data['safe_alone_daylight']
+    for crime in crime_data:
+
+        value = float(crime_data[crime])
+        crime_data[crime] = math.ceil(value * 100)/100
+        #print "CRIME VALUES!!!!!!!", crime_data[crime]
+    #---------------------------------------   
+    # To do later. For changing the keys to better names.
+    # d = {'x':1, 'y':2, 'z':3}
+    # d1 = {'x':'a', 'y':'b', 'z':'c'}
+    # new_dict = dict((d1[key], value) for (key, value) in d.items())   
+    #-----------------------------------------
+    return jsonify(crime_data)    
 
 
 @app.route('/register', methods=['GET'])

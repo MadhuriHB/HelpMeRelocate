@@ -1,10 +1,58 @@
 {% extends 'base.html' %}
 {% block content %}
 
-   {% for crime_type, crime in crime_data.items() %}
-       
-       {{ crime_type }} : {{ crime }} <br><br>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
-   {% endfor %}
+
+<canvas id="radarChart"></canvas>
+
+
+<script>
+    
+    $.get("/crime-chart-data", makeRadarChart);
+    function makeRadarChart(data){
+        var labels = []
+        var input_data = []
+       
+        for(var k in data){ 
+            labels.push(k);
+            input_data.push(data[k]);
+        }
+
+      
+        var canvas = document.getElementById('radarChart');
+        var ctx = canvas.getContext("2d");
+
+        var data = {
+            labels: labels,
+
+            datasets: [
+                {
+                    label: "My chart dataset",
+                    backgroundColor: "rgba(179,181,198,0.2)",
+                    borderColor: "rgba(179,181,198,1)",
+                    pointBackgroundColor: "rgba(255,0,0,1)",
+                    pointBorderColor: "#fff",
+                    pointHoverBackgroundColor: "#fff",
+                    pointHoverBorderColor: "rgba(179,181,198,1)",
+                    data: input_data
+                }
+            ]
+
+        };
+
+        var myRadarChart = new Chart(ctx, {
+            type: 'radar',
+            data: data
+        
+        }); 
+
+}
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
 
 {% endblock %}

@@ -85,8 +85,7 @@ def get_city_summary():
     # page = wikipedia.page(city + " " + state)
     # summary = page.summary
     
-    results_tuple = wikipedia.search(city+" "+state_full_name, results=5, suggestion=False)
-    results = results_tuple
+    results = wikipedia.search(city+" "+state_full_name, results=5, suggestion=False)
     first_page = results[0]
     wiki_page = wikipedia.page(first_page)
     summary = wiki_page.summary
@@ -165,15 +164,15 @@ def get_schools():
                 node_dict[name] = childnode.toxml()
 
         #Temporary school object for each school         
-        tempSchoolObject = School(gsid=node_dict.get("gsId"), name=node_dict.get("name"), schoolType=node_dict.get("type"),
-                                  gradeRange=node_dict.get("gradeRange"), city=node_dict.get("city"),
+        tempSchoolObject = School(gsid=node_dict.get("gsId"), name=node_dict.get("name"), school_type=node_dict.get("type"),
+                                  grade_range=node_dict.get("gradeRange"), city=node_dict.get("city"),
                                   state=node_dict.get("state"), address=node_dict.get("address"),
                                   phone=node_dict.get("phone"), website=node_dict.get("website"),
                                   latitude=node_dict.get("lat"), longitude=node_dict.get("lon"),
-                                  parentRating=node_dict.get("parentRating"),
-                                  overviewLink=node_dict.get("overviewLink"), 
-                                  ratingsLink=node_dict.get("ratingsLink"),
-                                  reviewsLink=node_dict.get("reviewsLink"))
+                                  parent_rating=node_dict.get("parentRating"),
+                                  overview_link=node_dict.get("overviewLink"), 
+                                  ratings_link=node_dict.get("ratingsLink"),
+                                  reviews_link=node_dict.get("reviewsLink"))
         
         # call function to get great school rating for each school
 

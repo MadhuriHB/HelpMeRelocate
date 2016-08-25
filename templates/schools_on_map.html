@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<div id="googleMap" style="width:1000px;height:500px;"></div>
+<script>
+  
+
+    $.get("/school_map_data", initialize)
+    function initialize(data) {
+       
+       
+        var schools = data['schools'];
+        var map_center = new google.maps.LatLng(40.7039, -74.0139);
+
+        var mapProp = {
+                        center: map_center,
+                        zoom: 15,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP,
+                        clickableIcons: true
+                      };
+
+        var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+
+
+        var school, marker;
+
+
+       
+        
+
+        var infowindow = new google.maps.InfoWindow({
+            content: "",
+            maxWidth: 500,
+            maxHeight: 200
+        });
+
+
+        var bounds = new google.maps.LatLngBounds();
+        for(var key in schools){
+           
+            school = schools[key];
+            
+            position = new google.maps.LatLng(parseFloat(school.latitude), parseFloat(school.longitude));
+            bounds.extend(position);
+
+            marker = new google.maps.Marker({
+            position: position,            
+            map: map,
+            title: school.name
+            });
+
+            map.fitBounds(bounds);
+    
+           // marker.addListener('click', function() {
+           // infoWindow.setContent(school.address+'<br>'+'score: '+school.score+'<br>');
+           // infowindow.open(map, marker);})
+
+
+           google.maps.event.addListener(marker, 'click', (function(marker) {
+            return function() {
+                infoWindow.setContent(school.address);
+                infoWindow.open(map, marker);
+            }
+        }));
+
+        } 
+
+   }
+    
+    google.maps.event.addDomListener(window, 'load', initialize);
+
+
+</script>
+
+
+{% endblock %}
