@@ -1,10 +1,6 @@
-{% extends 'base.html' %}
 {% block content %}
 
-     <div>
-            <button id='favorite' class="favorite-btn">&hearts;Favorite </button>
-    </div>
-   
+    
         
     {% for image in images %}
         <img src={{ image }} style="width:304px;height:228px;">
@@ -30,32 +26,29 @@
 
 
    
-            <script type="text/javascript">
+        <script type="text/javascript">
 
             $(function () { // this is the jquery shortcut for document.ready()
 
                 function addToFavorites(evt) {
                     
                     var id = this.id; // this is the id on the button we clicked, which is the image's id
-                    $.post("/add-to-favorites", {'id': id}, addToFavoritesSuccess)
-                   
+                    $.post("/add-to-favorites", {'id': id}, addToFavoritesSuccess);
+                  
                 }
 
                 function addToFavoritesSuccess(result) {
-
+                    
                     console.log(result.status);
-
                     var id = result.id;
-
-                    $('#' + id).css('color', 'red'); // give our user some feedback
+                    $(this).find('span').toggleClass('glyphicon-star-empty').toggleClass('glyphicon-star');
+                   
                 }
 
-                $('#favorite-btn').click(addToFavorites);
-
+                $('#favorite').click(addToFavorites);
             });
 
-
-            </script>
+        </script>
 
 
 

@@ -111,7 +111,7 @@ def add_to_favorites():
             flash("%s %s is addded as your Favorite" % (city, zipcode))
             return jsonify(id=iD)
 
-    return jsonify(status="message", id=iD)
+    return jsonify(status="success", id=iD)
 
 
 @app.route("/show_school")
@@ -130,9 +130,9 @@ def show_school_details():
             db.session.commit()
     else:
         schoolObjects = School.query.filter_by(neighborhood_id=zipcode).all()
-    
+
     #return render_template("school_details.html", zip_lat_lon=zip_lat_lon, schoolObjects=schoolObjects)
-    return render_template("schools_on_map.html")
+    return render_template("schools_on_map.html", schoolObjects=schoolObjects)
 
 
 @app.route("/school_map_data")
@@ -142,11 +142,7 @@ def show_schools_on_map():
     zipcode = ZIPCODE.zip
     kwargs = {'neighborhood_id': zipcode, 'school_type': 'public'}
     schoolObjects = School.query.filter_by(**kwargs).all()
-
     schools_list = [row2dict(schoolObject) for schoolObject in schoolObjects]
-    
-    #zipLatLng = {'lat': ZIPCODE.latitude, 'lng': ZIPCODE.longitude}
-    #schools_and_neighborhood = {'zipLatLng': zipLatLng, 'schools': schools}
     schools = {'schools': schools_list}
     return jsonify(schools)
 
@@ -214,6 +210,18 @@ def show_cost_of_living():
        		prices.append(price)
        
     return render_template("cost_of_living.html", prices=prices, indexes=resp_indexes)
+
+
+# @app.route("/cost_of_living")
+# def show_cost_of_living_chart():
+#     """bar chart for cost of living"""
+#     ZIPCODE = get_global_zipcodeObject()
+#     zipcode = ZIPCODE.zip
+#     resp_indexes_object = CostOfLiving.query.filter_by(neighborhood_id=zipcode).first()
+#     resp_indexes = row2dict(resp_indexes_object)
+    
+
+
 
 
 @app.route("/crime_rate")
