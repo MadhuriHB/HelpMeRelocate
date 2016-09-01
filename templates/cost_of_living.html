@@ -1,8 +1,78 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <button type="button" id="table-button" class="btn btn-primary">Primary</button>
 
-    {% for dict in prices %}  
+
+<div class="container">
+  <h2>Schools in this neighborhood</h2>
+   <table class="table table-condensed pagination"> 
+  
+       <!--  <thead>
+          <tr>
+            <th>Score</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Grade range</th>
+            <th>Parent rating</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Website</th>
+          </tr>
+        </thead> -->
+        {% for schoolObject in schoolObjects %}
+            <tbody>
+              {% if schoolObject.school_type == "public" %}
+              <tr class="success" >
+                <td>{{ schoolObject.score }}</td>
+                <td>{{ schoolObject.name }}</td>
+                <td>{{ schoolObject.school_type }}</td>
+                <td>{{ schoolObject.latitude }}</td>
+                <td>{{ schoolObject.longitude }}</td>
+                <td>{{ schoolObject.grade_range }}</td>
+                <td>{{ schoolObject.parent_rating }}</td>
+                <td>{{ schoolObject.city }}</td>
+                <td>{{ schoolObject.state }}</td>
+                <td>{{ schoolObject.address }}</td>
+                <td>{{ schoolObject.phone }}</td>
+                <td><a href="{{ schoolObject.website }}">{{ schoolObject.website }}</td>
+
+              </tr>
+              {% elif schoolObject.school_type == "private" %}
+               <tr class="info" >
+                <td>{{ schoolObject.score }}</td>
+                <td>{{ schoolObject.name }}</td>
+                <td>{{ schoolObject.school_type }}</td>
+                <td>{{ schoolObject.latitude }}</td>
+                <td>{{ schoolObject.longitude }}</td>
+                <td>{{ schoolObject.grade_range }}</td>
+                <td>{{ schoolObject.parent_rating }}</td>
+                <td>{{ schoolObject.city }}</td>
+                <td>{{ schoolObject.state }}</td>
+                <td>{{ schoolObject.address }}</td>
+                <td>{{ schoolObject.phone }}</td>
+                <td><a href="{{ schoolObject.website }}">{{ schoolObject.website }}</td>
+
+              </tr>
+              {% endif %}
+            
+            </tbody>
+        {% endfor %}
+      </table>
+     
+
+   
+
+        
+    ______________________COST OF LIVING INDICES ________________________<br><br>
+
+
+
+     {% for dict in prices %}  
         <table>
 
             {% for key, value in dict.items() %}
@@ -16,9 +86,7 @@
 
     {% endfor %}
 
-        
-    ______________________COST OF LIVING INDICES ________________________<br><br>
-    
+ ===============================================================================   
         <table>
 
             {% for key, value in indexes.items() %}

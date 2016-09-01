@@ -7,30 +7,124 @@
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-        <script src="http://maps.googleapis.com/maps/api/js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8SCyI2D64puWNUYuV1Xi8JjtPWoVKAgc"></script>
     </head>
     <body>
 
 
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">Help Me Relocate</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li id="home" class="active"><a href="/">Home</a></li>
+                <li id= "overview"><a href="/show_city">Overview</a></li>
+                <li id= "school"><a href="/show_school">Schools</a></li>
+                <li id="cost"><a href="/cost_of_living">Cost of Living</a></li>
+                <li id="crime"><a href="/crime_rate">Safety</a></li>
+    
+              <!-- <li><a href="/show_city">Overview</a></li> -->
+              <!-- <li><a href="#"></a></li>  -->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+             <!--  <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+              <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li> -->
+             
+            {% if "user_id" in session %}
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/show_favorites">Show Favorites</a></li>
+                <li><button id="favorite" class="btn btn-primary" type="submit"> <span id="favorite_star" class="glyphicon glyphicon-star-empty"></span>Favorite</button></li>
+                
+            {% else %}
+                <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        
+           {% endif %}
+            </ul>
+          </div>
+        </nav>
 
-        {% if "user_id" in session %}
+
+        <script type="text/javascript">
+         $(function () { // this is the jquery shortcut for document.ready()
+                function addToFavorites(evt) {
+                    var id = this.id; // this is the id on the button we clicked, which is the image's id
+                    $.post("/add-to-favorites", {'id': id}, addToFavoritesSuccess);
+                }
+
+                function addToFavoritesSuccess(result) {
+                    
+                    console.log(result.status);
+                    var id = result.id;
+                    if (result.status === "added")
+                    {
+                    $("#favorite_star").toggleClass('glyphicon-star');
+                    $("#favorite_star").toggleClass('glyphicon-star-empty');                 
+                   
+                    }
+                    else{
+
+                    $("#favorite_star").toggleClass('glyphicon-star-empty');
+                    $("#favorite_star").toggleClass('glyphicon-star');
+                   
+                    }
+                   
+                }
+
+                $('#favorite').click(addToFavorites);
+            });
+          </script>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Help Me Relocate</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="/">Home</a></li>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/register">Register</a></li>
+          <li><a href="/show_favorites">Show Favorites</a></li>
+
+        </ul>
+      </div>
+    </nav> -->
+
+        <!-- {% if "user_id" in session %}
             <a href="/logout">Logout</a>
             <div>
-                <button id="favorite" class="btn btn-primary" type="submit"> <span class="glyphicon glyphicon-star-empty"></span>Favorite</button>
+                <button id="favorite" class="btn btn-primary" type="submit"> <span id="favorite_star" class="glyphicon glyphicon-star-empty"></span>Favorite</button>
             </div>
-
+            <div>
+               <a id="show-fav" href="/show_favorites" class="btn btn-info" role="button"></a>
+            </div>
    
         {% else %}
-            <a href="/login">Login</a> &nbsp; &nbsp;
-            <a href="/register">Register</a>
+            <a id="login" href="/login">Login</a> &nbsp; &nbsp;
+            <a id="register" href="/register">Register</a>
+        
         {% endif %}
-
-         
+          -->
 
         {% for flash in get_flashed_messages() %}
             <div class="alert alert-messages" style="width:90%; margin:0 auto;">{{ flash }}</div>
+            <script type="text/javascript">
+                alert({{ flash }});
+            </script>
+            
         {% endfor %}
 
         {% block content%}

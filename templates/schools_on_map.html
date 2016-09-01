@@ -9,6 +9,13 @@
 
 {% block content %}
 
+<script type="text/javascript">
+$("#school").attr("class", "active")
+$("#home").attr("class", "inactive")
+
+</script>
+
+
 <div id="googleMap" style="width:1500px;height:500px;"></div>
 <script>    
     
@@ -57,22 +64,17 @@
             animation: google.maps.Animation.DROP,
             title: school.name
             });
-            console.log(marker);
+            // console.log(marker);
 
             map.fitBounds(bounds);
     
-           // marker.addListener('click', function() {
-           // infoWindow.setContent(school.address+'<br>'+'score: '+school.score+'<br>');
-           // infowindow.open(map, marker);})
 
-           
-            console.log(school.name);
-             google.maps.event.addListener(marker, 'click', (function(marker,infowindow){
+            google.maps.event.addListener(marker, 'click', (function(marker,infowindow){
               return function() {
               infowindow.close(); // Close previously openpened infowindow
               infowindow.setContent(marker.title);     
               infowindow.open(map, marker);
-            };
+              };
             })(marker, infowindow));
 
       } 
@@ -83,8 +85,15 @@
 
 </script>
 
+
+<!-- chart for school -->
+
+
+
+
+
+
 <!-- ======================================================================================<-->
-<button type="button" id="table-button" class="btn btn-primary">Primary</button>
 
 
 <div class="container">
@@ -96,12 +105,8 @@
             <th>Score</th>
             <th>Name</th>
             <th>Type</th>
-            <th>Latitude</th>
-            <th>Longitude</th>
             <th>Grade range</th>
-            <th>Parent rating</th>
-            <th>City</th>
-            <th>State</th>
+            <th>Parent rating</th>        
             <th>Address</th>
             <th>Phone</th>
             <th>Website</th>
@@ -114,12 +119,8 @@
                 <td>{{ schoolObject.score }}</td>
                 <td>{{ schoolObject.name }}</td>
                 <td>{{ schoolObject.school_type }}</td>
-                <td>{{ schoolObject.latitude }}</td>
-                <td>{{ schoolObject.longitude }}</td>
                 <td>{{ schoolObject.grade_range }}</td>
                 <td>{{ schoolObject.parent_rating }}</td>
-                <td>{{ schoolObject.city }}</td>
-                <td>{{ schoolObject.state }}</td>
                 <td>{{ schoolObject.address }}</td>
                 <td>{{ schoolObject.phone }}</td>
                 <td><a href="{{ schoolObject.website }}">{{ schoolObject.website }}</td>
@@ -130,12 +131,8 @@
                 <td>{{ schoolObject.score }}</td>
                 <td>{{ schoolObject.name }}</td>
                 <td>{{ schoolObject.school_type }}</td>
-                <td>{{ schoolObject.latitude }}</td>
-                <td>{{ schoolObject.longitude }}</td>
                 <td>{{ schoolObject.grade_range }}</td>
                 <td>{{ schoolObject.parent_rating }}</td>
-                <td>{{ schoolObject.city }}</td>
-                <td>{{ schoolObject.state }}</td>
                 <td>{{ schoolObject.address }}</td>
                 <td>{{ schoolObject.phone }}</td>
                 <td><a href="{{ schoolObject.website }}">{{ schoolObject.website }}</td>
@@ -146,6 +143,13 @@
             </tbody>
         {% endfor %}
       </table>
+
+      
+
+
+
+
+      
      
 
 {% endblock %}

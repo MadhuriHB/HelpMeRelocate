@@ -31,6 +31,7 @@ app.jinja_env.undefined = StrictUndefined
 API_KEY = os.environ.get("API_KEY")
 API_KEY_GS = os.environ.get("api_key_gs")
 API_KEY_NUMBEO = os.environ.get("API_KEY_NUMBEO")
+API_KEY_GOOGLE = os.environ.get("API_KEY_GOOGLE")
 
 
 @app.route('/')
@@ -101,17 +102,20 @@ def add_to_favorites():
         city = ZIPCODE.city
        
         #check to see if favorite is already in DB
-        is_fav_in_db = Favorites.query.filter_by(neighborhood_id=zipcode).first()
+        fav_in_db = Favorites.query.filter_by(neighborhood_id=zipcode).first()
         
-        if is_fav_in_db is None:
+        if fav_in_db is None:
             #favorite instance to sotre in DB
             favorite = Favorites(user_id=user_id, neighborhood_id=zipcode)
             db.session.add(favorite)
             db.session.commit()
             flash("%s %s is addded as your Favorite" % (city, zipcode))
-            return jsonify(id=iD)
-
-    return jsonify(status="success", id=iD)
+            return jsonify(status="added", id=iD)
+        else:
+            db.session.delete(fav_in_db)
+            db.session.commit()
+            flash("%s %s is deleted from your Favorite" % (city, zipcode))
+            return jsonify(status="deleted", id=iD)
 
 
 @app.route("/show_school")
@@ -209,20 +213,94 @@ def show_cost_of_living():
        		price = row2dict(priceObject)
        		prices.append(price)
        
-    return render_template("cost_of_living.html", prices=prices, indexes=resp_indexes)
+    return render_template("cost_of_living_chart.html", prices=prices, indexes=resp_indexes)
 
 
-# @app.route("/cost_of_living")
-# def show_cost_of_living_chart():
-#     """bar chart for cost of living"""
-#     ZIPCODE = get_global_zipcodeObject()
-#     zipcode = ZIPCODE.zip
-#     resp_indexes_object = CostOfLiving.query.filter_by(neighborhood_id=zipcode).first()
-#     resp_indexes = row2dict(resp_indexes_object)
-    
+@app.route("/show_price_chart_data")
+def show_price_items_chart():
+    """chart for price items"""
+    ZIPCODE = get_global_zipcodeObject()
+    zipcode = ZIPCODE.zip
+    cost_of_living = CostOfLiving.query.filter_by(neighborhood_id=zipcode).first() 
+    priceObjects = PriceItems.query.filter_by(cost_id=cost_of_living.cost_id).all()
+    prices = {}
+    restaurants = {}
+    markets = {}
+    transportation = {}
+    utilities = {}
+    sports_and_leisure = {}
+    clothing_and_shoes = {}
+    rent_per_month = {}
+    buy_apt_price = {}
+    salaries_and_fin = {}
+    #import pdb; pdb.set_trace()
+    for priceObject in priceObjects:
+       # new_price_dict = {}
+        price = row2dict(priceObject)
+        # print "Each PRICE !!!!", price
+        names = price['item_name'].split(",")
+       
+       #any("Buy Apartment Price" in s for s in names)
+        if any("Restaurants" in s for s in names):
+            restaurants[names[0]] = price['average_price']
+          
+        elif any("Markets" in s for s in names):
+            markets[names[0]] = price['average_price']
+           
+        elif any("Transportation" in s for s in names):
+            transportation[names[0]] = price['average_price']
+        
+        elif any("Utilities" in s for s in names):
+            utilities[names[0]] = price['average_price']
+
+        elif any("Sports And Leisure" in s for s in names):
+            sports_and_leisure[names[0]] = price['average_price']
+        
+        elif any("Clothing And Shoes" in s for s in names):
+            clothing_and_shoes[names[0]] = price['average_price']
+           
+        elif any("Rent Per Month" in s for s in names):
+            rent_per_month[names[0]] = price['average_price']
+            
+        elif any("Buy Apartment Price" in s for s in names):
+            buy_apt_price[names[0]] = price['average_price']
+           
+        else:
+            salaries_and_fin[names[0]] = price['average_price']
+         
+       # new_price_dict['avg-price'] = price['average_price'] 
+    prices['restaurants'] = restaurants
+    prices['markets'] = markets
+    prices['transportation'] = transportation
+    prices['utilities'] = utilities
+    prices['sports_and_leisure'] = sports_and_leisure
+    prices['clothing_and_shoes'] = clothing_and_shoes
+    prices['rent_per_month'] = rent_per_month
+    prices['buy_apt_price'] = buy_apt_price
+    prices['salaries_and_fin'] = salaries_and_fin
+
+    # print "PRICES DICTIONARY!!!!!!", prices
+
+    #return render_template("price_chart.html", prices=prices)
+    return jsonify(prices)
 
 
+@app.route("/show_price_chart")
+def show_price_charts():
+    return render_template("price_chart.html")
 
+
+@app.route("/cost_of_living-chart-data")
+def show_cost_of_living_chart():
+    """bar chart for cost of living"""
+    ZIPCODE = get_global_zipcodeObject()
+    zipcode = ZIPCODE.zip
+    resp_indexes_object = CostOfLiving.query.filter_by(neighborhood_id=zipcode).first()
+    resp_indexes = row2dict(resp_indexes_object)
+    del resp_indexes['neighborhood_id']
+    del resp_indexes['cost_id']        
+    return jsonify(resp_indexes)
+        
 
 @app.route("/crime_rate")
 def show_crime_rate():
@@ -294,6 +372,7 @@ def give_chart_data():
     for crime in crime_data:
 
         value = float(crime_data[crime])
+        
         crime_data[crime] = math.ceil(value * 100)/100
         #print "CRIME VALUES!!!!!!!", crime_data[crime]
     #---------------------------------------   
@@ -372,6 +451,112 @@ def logout():
     return redirect("/")
 
 
+# @app.route('/show_neighborhoods')
+# def show_compare():
+#     return render_template("comparison.html")
+
+    
+@app.route('/show_favorites')
+def show_neighborhoods():
+    """compare up to three neighborhoods"""
+    if 'user_id' in session.keys(): 
+        user_id = session["user_id"] 
+        neighborhoods = []
+        favorites = Favorites.query.filter_by(user_id=user_id).all()
+        for favorite in favorites:
+            neighborhood = Neighborhood.query.filter_by(neighborhood_id=favorite.neighborhood_id).first()
+            neighborhood_dict = {'zipcode': neighborhood.neighborhood_id, 'city': neighborhood.city, 'state': neighborhood.state}
+            neighborhoods.append(neighborhood_dict)
+    # print "Neighborhoods!!!!!", neighborhoods
+        session["fav_neighborhoods"] = neighborhoods
+    return render_template("comparison.html", neighborhoods=neighborhoods)
+
+
+@app.route('/compare', methods=['POST'])
+def show_compared_data():
+
+    zipcode1 = request.form.get("zipcode1")
+    zipcode2 = request.form.get("zipcode2")
+    return render_template("show_comparison.html", zipcode1=zipcode1, zipcode2=zipcode2)
+
+
+@app.route("/show_comparison")
+def compare_neighborhoods():
+    zipcode1 = request.args.get("zipcode1")
+    zipcode2 = request.args.get("zipcode2")
+    # import pdb; pdb.set_trace()
+    # if request.method == "POST":
+    #     # 
+
+    # if request.args.get('ajax'):
+
+
+    # print "ZIPCODE1!!!!!!", zipcode1
+    # print "ZIPCODE2!!!!!!", zipcode2
+
+    neighborhood1 = {}
+    neighborhood2 = {}
+    if zipcode1 is not None and zipcode2 is not None:
+        
+        cost_of_living1 = CostOfLiving.query.filter_by(neighborhood_id=zipcode1).first()
+        cost_of_living1_dict = row2dict(cost_of_living1)
+
+     
+        new_keys_dict = {'cost_id': 'cost_id', 'neighborhood_id': 'neighborhood_id', 'pollution_index': 'Pollution', 'traffic_time_index': 'Traffic Time','groceries_index': 'Groceries' ,
+                'hotel_price_index': 'Hotel', 'cpi_index': 'Consumer Price Index', 'restaurant_price_index': 'Restaurants',
+                'property_price_to_income_ratio': 'Property-Income ratio', 'health_care_index': 'Healthcare', 'crime_index': 'Crime',
+                'safety_index': 'Safety', 'cpi_and_rent_index': 'CPI+Rent', 'rent_index': 'Rent',
+                'traffic_inefficiency_index': 'Traffic Inefficiency', 'purchasing_power_incl_rent_index': 'Purchasing power',
+                'traffic_index': 'Traffic', 'raffic_co2_index': 'Traffic-co2'}
+   
+        cost_new_dict1 = dict((new_keys_dict[key], value) for (key, value) in cost_of_living1_dict.items())
+        del cost_new_dict1['cost_id']
+        del cost_new_dict1['neighborhood_id']
+
+        cost_of_living2 = CostOfLiving.query.filter_by(neighborhood_id=zipcode2).first()
+        cost_of_living2_dict = row2dict(cost_of_living2)
+        
+        cost_new_dict2 = dict((new_keys_dict[key], value) for (key, value) in cost_of_living2_dict.items())
+        del cost_new_dict2['cost_id']
+        del cost_new_dict2['neighborhood_id']
+
+        schools1 = School.query.filter(School.neighborhood_id == zipcode1).all()        
+        schools2 = School.query.filter(School.neighborhood_id == zipcode2).all()
+        schools1_list = []
+        schools2_list = []
+
+        if len(schools1) is 0:
+            neighborhood1['schools'] = {}
+        else:
+            for school in schools1:
+                school_dict = {}
+                school_dict['name'] = school.name
+                school_dict['score'] = school.score
+                schools1_list.append(school_dict)
+
+        if len(schools2) is 0:
+            neighborhood2['schools'] = {}
+        else:
+            for school in schools2:
+                school_dict = {}
+                school_dict['name'] = school.name
+                school_dict['score'] = school.score
+                schools2_list.append(school_dict)
+
+        neighborhood1['schools'] = schools1_list
+        neighborhood2['schools'] = schools2_list
+
+        # neighborhood1['cost_of_living'] = cost_of_living1_dict
+       
+        # neighborhood2['cost_of_living'] = cost_of_living2_dict
+       
+        neighborhood1['cost_of_living'] = cost_new_dict1
+       
+        neighborhood2['cost_of_living'] = cost_new_dict2
+
+        return jsonify(neighborhood1=neighborhood1, neighborhood2=neighborhood2)
+
+
 if __name__ == "__main__":
 
     # We have to set debug=True here, since it has to be True at the point
@@ -381,6 +566,6 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     app.run(host='0.0.0.0', debug=True)

@@ -105,9 +105,9 @@ class PriceItems(db.Model):
     cost_id = db.Column(db.Integer, db.ForeignKey(CostOfLiving.cost_id), nullable=False)
     item_id = db.Column(db.Integer)
     item_name = db.Column(db.Text, nullable=True)
-    average_price = db.Column(db.String(20), nullable=True)
-    lowest_price = db.Column(db.String(20), nullable=True)
-    highest_price = db.Column(db.String(20), nullable=True)
+    average_price = db.Column(db.Float, nullable=True)
+    lowest_price = db.Column(db.Float, nullable=True)
+    highest_price = db.Column(db.Float, nullable=True)
    
     cost_of_living = db.relationship("CostOfLiving", backref="price_list")
 

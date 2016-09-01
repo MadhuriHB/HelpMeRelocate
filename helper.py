@@ -80,16 +80,18 @@ def get_city_summary():
 
     global ZIPCODE
     city = ZIPCODE.city
-    state_abbr = ZIPCODE.state
-    state_full_name = get_state_full_name(state_abbr)
-    # page = wikipedia.page(city + " " + state)
-    # summary = page.summary
+    state = ZIPCODE.state
+    # state_abbr = ZIPCODE.state
+    # state_full_name = get_state_full_name(state_abbr)
+    page = wikipedia.page(city + " " + state)
+    summary = page.summary
     
-    results = wikipedia.search(city+" "+state_full_name, results=5, suggestion=False)
-    first_page = results[0]
-    wiki_page = wikipedia.page(first_page)
-    summary = wiki_page.summary
-    climate = wiki_page.section("Climate")
+    # results = wikipedia.search(city+" "+state_full_name, results=5, suggestion=False)
+    # first_page = results[0]
+    # wiki_page = wikipedia.page(first_page)
+    # summary = wiki_page.summary
+    # climate = wiki_page.section("Climate")
+    climate = page.section("Climate")
     
     return [summary, climate]
     
@@ -186,7 +188,7 @@ def find_nearest_city():
     """finds the nearest big city for the user city
        to find cost of living
     """
-    #import pdb; pdb.set_trace   
+    import pdb; pdb.set_trace   
 
     ZIPCODE = get_global_zipcodeObject()
     from geopy.distance import vincenty
@@ -213,11 +215,19 @@ def find_nearest_city():
     #city for the zipcode that user entered
     myCity = (myCitylat, myCitylon)
 
+    
     for cityObject in cityObjects:
+        # print "EACH CITY OBJRCT!!!!!!!!", cityObject
 
         #city lat and long from citiobject that we are comparing
-        isNearCity = (cityObject['latitude'], cityObject['longitude']) 
+        latitude = cityObject.get('latitude')
+        longitude = cityObject.get('longitude')
+        if latitude is not None and longitude is not None:
+            isNearCity = (latitude, longitude) 
+        else:
+            continue
         
+
         #geopy function vincenty to calculate the distance
         distance = vincenty(myCity, isNearCity).miles  
         if distance < nearestDistance:

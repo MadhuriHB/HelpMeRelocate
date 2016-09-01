@@ -1,20 +1,72 @@
+{% extends 'base.html' %}
+
 {% block content %}
 
-    
-        
-    {% for image in images %}
-        <img src={{ image }} style="width:304px;height:228px;">
-    {% endfor %}
-    
-    <br><br>
-    City name is {{ city }}. <br>
-    State name is {{ state }} <br><br>  
-    
+<script type="text/javascript">
+$("#overview").attr("class", "active")
+$("#home").attr("class", "inactive")
 
-    <a href="/show_school"><h3>Show schools</h3></a> <br>
+</script>
+
+
+
+ <h2>{{ city }}, {{ state }} </h2>
+
+<!-- <a href="/show_school"><h3>Show schools</h3></a> <br>
+    <a href="/cost_of_living"><h3>Show Cost of Living</h3></a><br>
+    <a href="/crime_rate"><h3>Show crime rate </h3></a><br> -->
+    <!-- <a href="/show_price_chart"><h3>Show price items</h3></a><br> -->
+
+    <p>{{ summary }}</p> <br><br><br>
+    
+    {% if climate is not none %}
+        <h3>Climate</h3> <br>
+        <p>{{ climate }}</p>
+    {% endif %}
+
+<style>
+  .carousel-inner > .item > img,
+
+  .carousel-inner > .item > a > img {
+      width: 60%;
+      margin: auto;
+  }
+</style>
+<body>
+
+<div class="container">
+  <br>
+  <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+
+      <div class="item active">
+        <img src="{{ images[0] }}" alt="image" width:auto height:auto >
+      </div>
+      {% for image in images[1:]%}
+      <div class="item">
+        <img src="{{ image }}" alt="image" width:auto height:auto>
+      </div>
+      {%endfor%}
+    </div>
+
+    <!-- Left and right controls -->
+    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>
+</div>
+    
+    <!-- <a href="/show_school"><h3>Show schools</h3></a> <br>
     <a href="/cost_of_living"><h3>Show Cost of Living</h3></a><br>
     <a href="/crime_rate"><h3>Show crime rate </h3></a><br>
-    
+    <a href="/show_price_chart"><h3>Show price items</h3></a><br>
 
     <h2>About the city >></h2> <br>
     <p>{{ summary }}</p> <br><br><br>
@@ -24,34 +76,37 @@
         <p>{{ climate }}</p>
     {% endif %}
 
-
+ -->
    
         <script type="text/javascript">
 
-            $(function () { // this is the jquery shortcut for document.ready()
+            // $(function () { // this is the jquery shortcut for document.ready()
+            //     function addToFavorites(evt) {
+            //         var id = this.id; // this is the id on the button we clicked, which is the image's id
+            //         $.post("/add-to-favorites", {'id': id}, addToFavoritesSuccess);
+            //     }
 
-                function addToFavorites(evt) {
+            //     function addToFavoritesSuccess(result) {
                     
-                    var id = this.id; // this is the id on the button we clicked, which is the image's id
-                    $.post("/add-to-favorites", {'id': id}, addToFavoritesSuccess);
-                  
-                }
-
-                function addToFavoritesSuccess(result) {
-                    
-                    console.log(result.status);
-                    var id = result.id;
-                    $(this).find('span').toggleClass('glyphicon-star-empty').toggleClass('glyphicon-star');
+            //         console.log(result.status);
+            //         var id = result.id;
+            //         if (result.status === "added")
+            //         {
+            //         $("#favorite_star").toggleClass('glyphicon-star');
+            //         $("#favorite_star").toggleClass('glyphicon-star-empty');                 
                    
-                }
+            //         }
+            //         else{
 
-                $('#favorite').click(addToFavorites);
-            });
+            //         $("#favorite_star").toggleClass('glyphicon-star-empty');
+            //         $("#favorite_star").toggleClass('glyphicon-star');
+                   
+            //         }
+                   
+            //     }
+
+            //     $('#favorite').click(addToFavorites);
+            // });
 
         </script>
-
-
-
-    
-
 {% endblock %}
