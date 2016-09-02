@@ -16,7 +16,7 @@ $("#home").attr("class", "inactive")
 </script>
 
 
-<div id="googleMap" style="width:1500px;height:500px;"></div>
+<div id="googleMap" style="width:1200px;height:400px;"></div>
 <script>    
     
     $.get("/school_map_data", initialize)
@@ -62,7 +62,7 @@ $("#home").attr("class", "inactive")
             position: position,            
             map: map,
             animation: google.maps.Animation.DROP,
-            title: school.name
+            title: "<b>"+school.name+"<br>"+school.address+"<br>"+"Score: "+school.score+"</b>"
             });
             // console.log(marker);
 

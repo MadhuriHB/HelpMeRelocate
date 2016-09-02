@@ -27,16 +27,9 @@ def find_zipcode_from_input(input_string):
     zcdb = ZipCodeDatabase() 
 
     input_string.strip()
-    if input_string.isnumeric():
-        ZIPCODE = zcdb[input_string]
 
-    else:
-        zipcodeList = zcdb.find_zip(input_string)
-        if zipcodeList is not None and len(zipcodeList) >= 1:
-            ZIPCODE = zipcodeList[0]
-        else: 
-            return None
-    #print "This is ZIPCODE", ZIPCODE.zip
+    ZIPCODE = zcdb[input_string]
+
     return ZIPCODE
 
 
@@ -188,9 +181,11 @@ def find_nearest_city():
     """finds the nearest big city for the user city
        to find cost of living
     """
-    import pdb; pdb.set_trace   
-
+   
     ZIPCODE = get_global_zipcodeObject()
+    if ZIPCODE is None:
+        return None
+
     from geopy.distance import vincenty
     
     myCitylat = ZIPCODE.latitude
@@ -217,7 +212,7 @@ def find_nearest_city():
 
     
     for cityObject in cityObjects:
-        # print "EACH CITY OBJRCT!!!!!!!!", cityObject
+       
 
         #city lat and long from citiobject that we are comparing
         latitude = cityObject.get('latitude')

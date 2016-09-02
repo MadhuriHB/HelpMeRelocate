@@ -37,55 +37,55 @@ API_KEY_GOOGLE = os.environ.get("API_KEY_GOOGLE")
 @app.route('/')
 def index():
     """Homepage."""
-    return render_template("index.html")
+    return render_template("index_map.html")
 
 
 @app.route("/show_city")
 def show_city_data():
-    #import pdb; pdb.set_trace()
-
+    
     input_string = request.args.get("zipcode")
+   
+    if input_string is None:   
+        return redirect("/")
 
     ZIPCODE = find_zipcode_from_input(input_string)
     zipcode = ZIPCODE.zip
-    if zipcode is not None:   
-        is_neighborhood_in_db = Neighborhood.query.filter_by(neighborhood_id=zipcode).first()
-        #check if neighborhood is already in DB 
-        if is_neighborhood_in_db is None:
-            #call function from helper to get images    
-            images = get_city_images()  
-            image_urls = [image['src'] for image in images]
-            
-            zipcodeObject = get_global_zipcodeObject()
-            city = zipcodeObject.city
-            state = zipcodeObject.state
-            #call function from helper to get summary, climate
-            summary, climate = get_city_summary()
-            #make neighborhood instance and store in DB
-            neighborhood = Neighborhood(neighborhood_id=zipcode, summary=summary, climate=climate, city=city, state=state)
-            db.session.add(neighborhood)
-            db.session.commit()
-            #store each image url in DB
-            if len(images) > 0:
-                for image in images:
-                    picture = Images(neighborhood_id=zipcode, image_url=image["src"])
-                    db.session.add(picture)
-                    db.session.commit()
-        
-        else:
-           
-            #Fetch the data for zipcode from database 
-            neighborhood = Neighborhood.query.filter_by(neighborhood_id=zipcode).first()
-            city = neighborhood.city
-            state = neighborhood.state
-            summary = neighborhood.summary
-            climate = neighborhood.climate
-            images = Images.query.filter_by(neighborhood_id=zipcode).all()
-            image_urls = [image.image_url for image in images]
-            
-    else:
-        redirect("/")
+    
 
+    is_neighborhood_in_db = Neighborhood.query.filter_by(neighborhood_id=zipcode).first()
+    #check if neighborhood is already in DB 
+    if is_neighborhood_in_db is None:
+        #call function from helper to get images    
+        images = get_city_images()  
+        image_urls = [image['src'] for image in images]
+        
+        zipcodeObject = get_global_zipcodeObject()
+        city = zipcodeObject.city
+        state = zipcodeObject.state
+        #call function from helper to get summary, climate
+        summary, climate = get_city_summary()
+        #make neighborhood instance and store in DB
+        neighborhood = Neighborhood(neighborhood_id=zipcode, summary=summary, climate=climate, city=city, state=state)
+        db.session.add(neighborhood)
+        db.session.commit()
+        #store each image url in DB
+        if len(images) > 0:
+            for image in images:
+                picture = Images(neighborhood_id=zipcode, image_url=image["src"])
+                db.session.add(picture)
+                db.session.commit()
+    
+    else:
+       
+        #Fetch the data for zipcode from database 
+        neighborhood = Neighborhood.query.filter_by(neighborhood_id=zipcode).first()
+        city = neighborhood.city
+        state = neighborhood.state
+        summary = neighborhood.summary
+        climate = neighborhood.climate
+        images = Images.query.filter_by(neighborhood_id=zipcode).all()
+        image_urls = [image.image_url for image in images]
+            
     return render_template("show_city_info.html", city=city, state=state, images=image_urls, summary=summary, climate=climate)
 
 
@@ -123,7 +123,11 @@ def show_school_details():
     """shows up to 200 schools within 5 miles of zipcode"""
     #import pdb; pdb.set_trace()
     ZIPCODE = get_global_zipcodeObject()
+    if ZIPCODE is None:
+        return redirect("/")
+
     zipcode = ZIPCODE.zip
+   
     #zip_lat_lon = {'lat': ZIPCODE.latitude, 'lon': ZIPCODE.longitude}
     school = School.query.filter_by(neighborhood_id=zipcode).first()
     if school is None:
@@ -143,7 +147,11 @@ def show_school_details():
 def show_schools_on_map():
 
     ZIPCODE = get_global_zipcodeObject()
+    if ZIPCODE is None:
+        return redirect("/")
+
     zipcode = ZIPCODE.zip
+   
     kwargs = {'neighborhood_id': zipcode, 'school_type': 'public'}
     schoolObjects = School.query.filter_by(**kwargs).all()
     schools_list = [row2dict(schoolObject) for schoolObject in schoolObjects]
@@ -155,10 +163,16 @@ def show_schools_on_map():
 def show_cost_of_living():
     """calculate cost of living for city"""
     
-    city = find_nearest_city()
+    
 
     ZIPCODE = get_global_zipcodeObject()
+    if ZIPCODE is None:
+        return redirect("/")
+
+    city = find_nearest_city()
     zipcode = ZIPCODE.zip
+    
+
     cost_of_living = CostOfLiving.query.filter_by(neighborhood_id=zipcode).first()
     if cost_of_living is None:     
         resp = requests.get("http://numbeo.com/api/city_prices?api_key=%s&city_id=%s" % (API_KEY_NUMBEO, city['city_id']))
@@ -220,7 +234,12 @@ def show_cost_of_living():
 def show_price_items_chart():
     """chart for price items"""
     ZIPCODE = get_global_zipcodeObject()
+    if ZIPCODE is None:
+        return redirect("/")
+
     zipcode = ZIPCODE.zip
+    
+
     cost_of_living = CostOfLiving.query.filter_by(neighborhood_id=zipcode).first() 
     priceObjects = PriceItems.query.filter_by(cost_id=cost_of_living.cost_id).all()
     prices = {}
@@ -279,9 +298,6 @@ def show_price_items_chart():
     prices['buy_apt_price'] = buy_apt_price
     prices['salaries_and_fin'] = salaries_and_fin
 
-    # print "PRICES DICTIONARY!!!!!!", prices
-
-    #return render_template("price_chart.html", prices=prices)
     return jsonify(prices)
 
 
@@ -306,9 +322,15 @@ def show_cost_of_living_chart():
 def show_crime_rate():
     """show crime rate for the city"""
     
-    city = find_nearest_city()
+    
     ZIPCODE = get_global_zipcodeObject()
+    if ZIPCODE is None:
+        return redirect("/")
+
+    city = find_nearest_city()
     zipcode = ZIPCODE.zip
+    
+
     crime_rate = Crime.query.filter_by(neighborhood_id=zipcode).first()
     if crime_rate is None:
 
@@ -354,6 +376,9 @@ def give_chart_data():
     #import pdb; pdb.set_trace()
     import math
     ZIPCODE = get_global_zipcodeObject()
+    if ZIPCODE is None:
+        return redirect("/")
+
     zipcode = ZIPCODE.zip
     crime_data = Crime.query.filter_by(neighborhood_id=zipcode).first()
     crime_data = row2dict(crime_data)
@@ -369,19 +394,26 @@ def give_chart_data():
     del crime_data['index_crime']
     del crime_data['safe_alone_night']
     del crime_data['safe_alone_daylight']
+    
     for crime in crime_data:
-
         value = float(crime_data[crime])
-        
         crime_data[crime] = math.ceil(value * 100)/100
-        #print "CRIME VALUES!!!!!!!", crime_data[crime]
-    #---------------------------------------   
-    # To do later. For changing the keys to better names.
-    # d = {'x':1, 'y':2, 'z':3}
-    # d1 = {'x':'a', 'y':'b', 'z':'c'}
-    # new_dict = dict((d1[key], value) for (key, value) in d.items())   
-    #-----------------------------------------
-    return jsonify(crime_data)    
+
+    #Make the key names user friendly to display on chart
+    new_crime_data = {"crime_increasing": "Crime Icrease", "worried_mugged_robbed": "Robbery",
+                        "worried_home_broken": "Break-Ins", "problem_property_crimes": "Property Crimes",
+                        "worried_things_car_stolen": "Things stolen", "level_of_crime": "Crime Level",
+                        "worried_insulted": "Insults/Abuse", "problem_drugs": "Drug Problems", "worried_attacked": "Attacks",
+                        "problem_violent_crimes": "Violence",
+                        "worried_skin_ethnic_religion": "Ethnic/Religion Crimes",
+                        "problem_corruption_bribery": "Corruption/Bribery",
+                        "worried_car_stolen": "Car stealing"
+                      }
+    
+    new_dict = dict((new_crime_data[key], value) for (key, value) in crime_data.items())
+
+   
+    return jsonify(new_dict)
 
 
 @app.route('/register', methods=['GET'])
@@ -407,7 +439,7 @@ def register_process():
     db.session.add(new_user)
     db.session.commit()
 
-    flash("User %s added." % email)
+    flash("Hi %s! Welcome to Help Me Relocate." % email)
     return redirect("/")
 
 
@@ -438,7 +470,7 @@ def login_process():
 
     session["user_id"] = user.user_id
 
-    flash("You are now Logged in")
+    # flash("You are now Logged in")
     return redirect("/")
 
 
@@ -447,13 +479,9 @@ def logout():
     """Log out."""
 
     del session["user_id"]
-    flash("Logged Out.")
+    # flash("Logged Out.")
     return redirect("/")
 
-
-# @app.route('/show_neighborhoods')
-# def show_compare():
-#     return render_template("comparison.html")
 
     
 @app.route('/show_favorites')
@@ -467,7 +495,7 @@ def show_neighborhoods():
             neighborhood = Neighborhood.query.filter_by(neighborhood_id=favorite.neighborhood_id).first()
             neighborhood_dict = {'zipcode': neighborhood.neighborhood_id, 'city': neighborhood.city, 'state': neighborhood.state}
             neighborhoods.append(neighborhood_dict)
-    # print "Neighborhoods!!!!!", neighborhoods
+   
         session["fav_neighborhoods"] = neighborhoods
     return render_template("comparison.html", neighborhoods=neighborhoods)
 
@@ -484,15 +512,6 @@ def show_compared_data():
 def compare_neighborhoods():
     zipcode1 = request.args.get("zipcode1")
     zipcode2 = request.args.get("zipcode2")
-    # import pdb; pdb.set_trace()
-    # if request.method == "POST":
-    #     # 
-
-    # if request.args.get('ajax'):
-
-
-    # print "ZIPCODE1!!!!!!", zipcode1
-    # print "ZIPCODE2!!!!!!", zipcode2
 
     neighborhood1 = {}
     neighborhood2 = {}
@@ -532,6 +551,7 @@ def compare_neighborhoods():
                 school_dict = {}
                 school_dict['name'] = school.name
                 school_dict['score'] = school.score
+                school_dict['parent_rating'] = school.parent_rating
                 schools1_list.append(school_dict)
 
         if len(schools2) is 0:
@@ -541,14 +561,11 @@ def compare_neighborhoods():
                 school_dict = {}
                 school_dict['name'] = school.name
                 school_dict['score'] = school.score
+                school_dict['parent_rating'] = school.parent_rating
                 schools2_list.append(school_dict)
 
         neighborhood1['schools'] = schools1_list
         neighborhood2['schools'] = schools2_list
-
-        # neighborhood1['cost_of_living'] = cost_of_living1_dict
-       
-        # neighborhood2['cost_of_living'] = cost_of_living2_dict
        
         neighborhood1['cost_of_living'] = cost_new_dict1
        
