@@ -1,0 +1,48 @@
+
+{%extends 'base.html'%}
+{%block content%}
+        <div class="container">
+         <h2>Your Favorite Neighborhoods</h2>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Neighborhood</th>
+                <th>City</th>
+                <th>State</th>
+              </tr>
+            </thead>
+             {% for neighborhood in neighborhoods %}
+            <tbody>
+            
+              <tr>
+                <td>{{ neighborhood['zipcode'] }}</td>
+                <td>{{ neighborhood['city'] }}</td>
+                <td>{{ neighborhood['state'] }}</td>
+              </tr>
+              
+            </tbody>
+            {% endfor %}
+          </table>
+        </div>
+
+
+
+<form action="/compare", method='post'>
+<select name="zipcode1" class="form-control">
+     {% for neighborhood in neighborhoods %}
+        <option>{{ neighborhood['zipcode'] }}</option>
+     {% endfor %}
+</select><br>
+<select name="zipcode2" class="form-control">
+     {% for neighborhood in neighborhoods %}
+        <option>{{ neighborhood['zipcode'] }}</option>
+     {% endfor %}
+</select><br>
+<input type="submit" value="Compare" class="btn btn-primary">
+
+</form>
+
+
+
+{% endblock %}
+

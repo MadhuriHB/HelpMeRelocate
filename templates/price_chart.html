@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<div>
+<canvas id="restaurant-bar-Chart"></canvas>
+</div>
+
+<!-- <div>
+<canvas id="transportation-bar-Chart"></canvas>
+</div>
+ -->
+<!-- <div>
+<canvas id="utilities-bar-Chart"></canvas>
+</div> -->
+
+
+
+
+
+<script>
+    
+    $.get("/show_price_chart_data", makePriceBarChart);
+    function makePriceBarChart(data){
+        var labels = []
+        var input_data = []
+        var restaurants = data['restaurants']
+        for(var k in restaurants){ 
+
+            labels.push(k);
+            input_data.push(restaurants[k]);
+        }
+
+      
+        var canvas = document.getElementById('restaurant-bar-Chart');
+        var ctx = canvas.getContext("2d");
+
+        var data = {
+            labels: labels,
+
+            datasets: [
+                {
+                    label: "Average Price in USD",
+
+                    backgroundColor: 'rgb(49, 205, 127)',
+                 
+                    borderColor: 'rgb(49, 205, 127)',
+                
+                    borderWidth: 3,
+                    data: input_data
+                }
+            ]
+
+        };
+
+        var mybarChart = new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                     scales:{
+                        yAxes: [{
+                                stacked: true,
+                                gridLines: {
+                                    display: false
+                                }
+
+                                }],
+                        xAxes: [{
+                                stacked: true,
+                                gridLines: {
+                                    display: false
+                                }
+
+                                }]
+                            }
+                        }
+
+        }); 
+
+}
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+
+
+
+
+
+{% endblock %}
+
+
+
+

@@ -505,7 +505,18 @@ def show_compared_data():
 
     zipcode1 = request.form.get("zipcode1")
     zipcode2 = request.form.get("zipcode2")
-    return render_template("show_comparison.html", zipcode1=zipcode1, zipcode2=zipcode2)
+    Neighborhood1 = Neighborhood.query.filter_by(neighborhood_id=zipcode1).first()
+    print "NEIGHBORHOOD1!!!!!!!", Neighborhood1
+    city1 = Neighborhood1.city
+    state1 = Neighborhood1.state 
+    Neighborhood2 = Neighborhood.query.filter_by(neighborhood_id=zipcode2).first()
+    print "NEIGHBORHOOD2!!!!!!!", Neighborhood2
+    city2 = Neighborhood2.city
+    print "CITY1!!!!!!!", city1
+    print "CITY2!!!!!!!", city2
+    state2 = Neighborhood2.state 
+
+    return render_template("show_comparison.html", zipcode1=zipcode1, zipcode2=zipcode2, city1=city1, state1=state1, city2=city2, state2=state2)
 
 
 @app.route("/show_comparison")
@@ -583,6 +594,6 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    # DebugToolbarExtension(app)
+    DebugToolbarExtension(app)
 
     app.run(host='0.0.0.0', debug=True)

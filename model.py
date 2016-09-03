@@ -189,6 +189,39 @@ class Favorites(db.Model):
         return "<Favorites neighborhood_id=%s user_id=%s >" % (self.neighborhood_id, self.user_id)
  
 
+
+# def example_data():
+#     """Create some sample data."""
+
+#     # In case this is run more than once, empty out existing data
+#     CostOfLiving.query.delete()
+#     User.query.delete()
+#     Crime.query.delete()
+#     PriceItems.query.delete()
+#     Favorites.query.delete()    
+
+    
+
+#     # Add sample Users
+#     Madhuri = User(email='Madhuri@yahoo.com', password='Madhuri', zipcode='93012')
+#     Jack = User(email='Jack@gmail.com', password='Jack', zipcode='94111')
+#     Subhash = user(email='Subhash@gmail.com', password='Subhash', zipcode='93010')
+#     Liz = User(email='Liz@hotmail.com', password='Liz', zipcode='80123')
+
+#     #Add sample Cost of living
+
+
+
+
+
+#     db.session.add_all([Madhuri, Jack, Subhash, Liz])
+#     db.session.commit()
+
+
+
+
+
+
 ##############################################################################
 # Helper functions
 
@@ -197,6 +230,7 @@ def connect_to_db(app):
 
     # Configure to use our PostgreSQL database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///relocate'
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///testdb'
     app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)

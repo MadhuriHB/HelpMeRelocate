@@ -1,0 +1,636 @@
+
+{% extends 'base.html' %}
+{% block content %}
+
+<script type="text/javascript">
+$("#cost").attr("class", "active")
+$("#home").attr("class", "inactive")
+
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<div class="container">
+  <h2>Cost Of Living</h2>
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#home">Cost Indices</a></li>
+    <li><a data-toggle="tab" href="#restaurants">Restaurants</a></li>
+    <li><a data-toggle="tab" href="#clothing">Clothing and Shoes</a></li>
+    <li><a data-toggle="tab" href="#markets">Markets</a></li>
+    <li><a data-toggle="tab" href="#transportation">Transportation</a></li>
+    <li><a data-toggle="tab" href="#sports">Sports and Leisure</a></li>
+    <li><a data-toggle="tab" href="#rent">Rent per Month</a></li>
+    <li><a data-toggle="tab" href="#buy_apt">Buying Apartments</a></li>
+    <li><a data-toggle="tab" href="#salary">Salaries and Finance</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="home" class="tab-pane fade in active">
+      <h3>HOME</h3>
+      <canvas id="barChart"  width="700" height="400"></canvas>
+      <script>
+
+
+       $.get("/cost_of_living-chart-data", makeBarChart);
+        function makeBarChart(data){
+        var labels = []
+        var input_data = []
+       
+        for(var k in data){ 
+            labels.push(k);
+            input_data.push(data[k]);
+        }
+      
+        var canvas = document.getElementById('barChart');
+        var ctx = canvas.getContext("2d");
+
+        var data = {
+            labels: labels,
+
+            datasets: [
+                {
+                    label: "Cost of living",
+
+                    backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+                'rgba(72, 228, 228, 0.2)',
+                'rgba(201, 27, 114, 0.2)',
+                'rgba(43, 236, 47, 0.2)',
+                'rgba(99, 97, 239, 0.2)',
+                'rgba(35, 171, 229, 0.2)',
+                'rgba(95, 39, 225, 0.2)',
+                'rgba(235, 64, 29, 0.2)',
+                'rgba(186, 23, 158, 0.2)',
+                'rgba(57, 213, 161, 0.2)',
+                'rgba(115, 20, 163, 0.2)'
+
+                 ],
+                 borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(72, 228, 228, 1)',
+                'rgba(201, 27, 114, 1)',
+                'rgba(43, 236, 47, 1)',
+                'rgba(99, 97, 239, 1)',
+                'rgba(35, 171, 229, 1)',
+                'rgba(95, 39, 225, 1)',
+                'rgba(235, 64, 29, 1)',
+                'rgba(186, 23, 158, 1)',
+                'rgba(57, 213, 161, 1)',
+                'rgba(115, 20, 163, 1)'
+
+                ],
+                borderWidth: 1,
+                data: input_data
+                }
+            ]
+
+        };
+
+        var mybarChart = new Chart(ctx, {
+            type: 'bar',
+            data: data
+        
+        }); 
+
+    }
+
+    </script>
+</div>
+
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script> -->
+
+<!-- restaurant tab starts here -->
+    <div id="restaurants" class="tab-pane fade">
+      <h3>Restaurants</h3>
+        <div>
+        <canvas id="restaurant-bar-Chart"  width="200" height="100"></canvas>
+        </div>
+        <script>
+            console.log("IN THE SCRPIT")
+            $.get("/show_price_chart_data", makePriceBarChart);
+            function makePriceBarChart(data){
+                var labels = []
+                var input_data = []
+                var restaurants = data['restaurants']
+                for(var k in restaurants){ 
+
+                    labels.push(k);
+                    input_data.push(restaurants[k]);
+                }
+
+              
+                var canvas = document.getElementById('restaurant-bar-Chart');
+                var ctx = canvas.getContext("2d");
+
+                var data = {
+                    labels: labels,
+
+                    datasets: [
+                        {
+                            label: "Average Price in USD",
+
+                            backgroundColor: 'rgb(49, 205, 127)',
+                         
+                            borderColor: 'rgb(49, 205, 127)',
+                        
+                            borderWidth: 3,
+                            data: input_data
+                        }
+                    ]
+
+                };
+
+                var mybarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                             scales:{
+                                yAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                            display: false
+                                        }
+
+                                        }],
+                                xAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                            display: false
+                                        }
+
+                                        }]
+                                    }
+                                }
+
+                }); 
+
+        }
+
+    </script>
+</div>
+<!-- restaurant tab ends here -->
+<!-- clothing tab starts here -->
+
+    <div id="clothing" class="tab-pane fade">
+      <h3>Clothing and Shoes</h3>
+
+        <canvas id="clothing-bar-Chart" width="200" height="100"></canvas>
+        <script>
+            console.log("IN THE SCRPIT")
+            $.get("/show_price_chart_data", makePriceBarChart);
+            function makePriceBarChart(data){
+                var labels = []
+                var input_data = []
+                var clothing = data['clothing_and_shoes']
+                for(var k in clothing){ 
+
+                    labels.push(k);
+                    input_data.push(clothing[k]);
+                }
+
+              
+                var canvas = document.getElementById('clothing-bar-Chart');
+                var ctx = canvas.getContext("2d");
+
+                var data = {
+                    labels: labels,
+
+                    datasets: [
+                        {
+                            label: "Average Price in USD",
+
+                            backgroundColor: 'rgb(49, 205, 127)',
+                         
+                            borderColor: 'rgb(49, 205, 127)',
+                        
+                            borderWidth: 1,
+                            data: input_data
+                        }
+                    ]
+
+                };
+
+                var mybarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                             scales:{
+                                yAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                            display: false
+                                        }
+
+                                        }],
+                                xAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                            display: false
+                                        }
+
+                                        }]
+                                    }
+                                }
+
+                }); 
+
+        }
+
+    </script>    
+</div>
+
+<!-- clothing tab ends here -->
+
+<!-- market tab starts here   -->
+
+    <div id="markets" class="tab-pane fade">
+      <h3>Markets</h3>
+        <canvas id="market-bar-Chart" width="200" height="100"></canvas>
+        <script>
+            console.log("IN THE SCRPIT")
+            $.get("/show_price_chart_data", makePriceBarChart);
+            function makePriceBarChart(data){
+                var labels = []
+                var input_data = []
+                var markets = data['markets']
+                for(var k in markets){ 
+
+                    labels.push(k);
+                    input_data.push(markets[k]);
+                }
+
+              
+                var canvas = document.getElementById('market-bar-Chart');
+                var ctx = canvas.getContext("2d");
+
+                var data = {
+                    labels: labels,
+
+                    datasets: [
+                        {
+                            label: "Average Price in USD",
+
+                            backgroundColor: 'rgb(49, 205, 127)',
+                         
+                            borderColor: 'rgb(49, 205, 127)',
+                        
+                            borderWidth: 3,
+                            data: input_data
+                        }
+                    ]
+
+                };
+
+                var mybarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                             scales:{
+                                yAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                            display: false
+                                        }
+
+                                        }],
+                                xAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                            display: false
+                                        }
+
+                                        }]
+                                    }
+                                }
+
+                }); 
+
+        }
+
+        </script>    
+
+    </div>
+
+<!-- market tab ends here -->
+
+<!-- Transportation tab starts here -->
+
+    <div id="transportation" class="tab-pane fade">
+      <h3>Transportation</h3>
+        <canvas id="transportation-bar-Chart" width="200" height="100"></canvas>
+        <script>
+            console.log("IN THE SCRPIT")
+            $.get("/show_price_chart_data", makePriceBarChart);
+            function makePriceBarChart(data){
+                var labels = [];
+                var input_data = [];
+                var transportation = data['transportation'];
+                for(var k in transportation){ 
+                    labels.push(k);
+                    input_data.push(transportation[k]);
+                }                                 
+                var canvas = document.getElementById('transportation-bar-Chart');
+                var ctx = canvas.getContext("2d");
+
+                var data = {
+                    labels: labels,
+
+                    datasets: [
+                            {
+                            label: "Average Price in USD",
+
+                            backgroundColor: 'rgb(49, 205, 127)',
+                         
+                            borderColor: 'rgb(49, 205, 127)',
+                            borderWidth: 3,
+                            data: input_data
+                            }
+                        ]
+                   };
+
+                var mybarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                             scales:{
+                                yAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                        display: false
+                                        }
+
+                                        }],
+                                xAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                        display: false
+                                        }
+
+                                        }]
+                                    }
+                                }
+
+                }); 
+
+        }
+
+       </script>    
+    </div>
+<!-- Transportation tab ends here -->
+
+
+<!-- Rent tab starts here -->
+
+    <div id="rent" class="tab-pane fade">
+      <h3>Rent Per Month</h3>
+        <canvas id="rent-bar-Chart" width="200" height="100"></canvas>
+        <script>
+            console.log("IN THE SCRPIT")
+            $.get("/show_price_chart_data", makePriceBarChart);
+            function makePriceBarChart(data){
+                var labels = [];
+                var input_data = [];
+                var rent = data['rent_per_month'];
+
+                for(var k in rent){ 
+                    labels.push(k);
+                    input_data.push(rent[k]);
+                }                   
+    
+              
+                var canvas = document.getElementById('rent-bar-Chart');
+                var ctx = canvas.getContext("2d");
+
+                var data = {
+                    labels: labels,
+
+                    datasets: [
+                            {
+                            label: "Average Price in USD",
+
+                            backgroundColor: 'rgb(49, 205, 127)',
+                         
+                            borderColor: 'rgb(49, 205, 127)',
+                            borderWidth: 3,
+                            data: input_data
+                            }
+                        ]
+  
+                   };
+
+                var mybarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                             scales:{
+                                yAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                        display: false
+                                        }
+
+                                        }],
+                                xAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                        display: false
+                                        }
+
+                                        }]
+                                    }
+                                }
+
+                }); 
+
+        }
+
+       </script>    
+    </div>
+<!-- Rent tab ends here -->
+
+
+<!-- Buy Apartment tab starts here -->
+
+    <div id="buy_apt" class="tab-pane fade">
+      <h3>Buying Apartment</h3>
+        <canvas id="buyApt-bar-Chart" width="200" height="100"></canvas>
+        <script>
+            console.log("IN THE SCRPIT")
+            $.get("/show_price_chart_data", makePriceBarChart);
+            function makePriceBarChart(data){
+                var labels = [];
+                var input_data = [];
+                var buy_apt = data['buy_apt_price'];
+                for(var k in buy_apt){ 
+                    labels.push(k);
+                    input_data.push(buy_apt[k]);
+                }                                 
+                var canvas = document.getElementById('buyApt-bar-Chart');
+                var ctx = canvas.getContext("2d");
+
+                var data = {
+                    labels: labels,
+
+                    datasets: [
+                            {
+                            label: "Average Price in USD",
+
+                            backgroundColor: 'rgb(49, 205, 127)',
+                         
+                            borderColor: 'rgb(49, 205, 127)',
+                            borderWidth: 3,
+                            data: input_data
+                            }
+                        ]
+                   };
+
+                var mybarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                             scales:{
+                                yAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                        display: false
+                                        }
+
+                                        }],
+                                xAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                        display: false
+                                        }
+
+                                        }]
+                                    }
+                                }
+
+                }); 
+
+        }
+
+       </script>    
+    </div>
+<!-- Buy Apartment tab ends here -->
+
+<!-- Buy Apartment tab starts here -->
+
+    <div id="sports" class="tab-pane fade">
+      <h3>Sports and Leisure</h3>
+        <div>
+        <canvas id="sports-bar-Chart" width="200" height="100"></canvas>
+        </div>
+        <script>
+            console.log("IN THE SCRPIT")
+            $.get("/show_price_chart_data", makePriceBarChart);
+            function makePriceBarChart(data){
+                var labels = [];
+                var input_data = [];
+                var sports = data['sports_and_leisure'];
+                for(var k in sports){ 
+                    labels.push(k);
+                    input_data.push(sports[k]);
+                }                                 
+                var canvas = document.getElementById('sports-bar-Chart');
+                var ctx = canvas.getContext("2d");
+
+                var data = {
+                    labels: labels,
+
+                    datasets: [
+                            {
+                            label: "Average Price in USD",
+
+                            backgroundColor: 'rgb(49, 205, 127)',
+                         
+                            borderColor: 'rgb(49, 205, 127)',
+                            borderWidth: 3,
+                            data: input_data
+                            }
+                        ]
+                   };
+
+                var mybarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                             scales:{
+                                yAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                        display: false
+                                        }
+
+                                        }],
+                                xAxes: [{
+                                        stacked: true,
+                                        gridLines: {
+                                        display: false
+                                        }
+
+                                        }]
+                                    }
+                                }
+
+                }); 
+
+        }
+
+       </script>    
+    </div>
+
+<!-- Sports and Leisure ends here -->
+
+ 
+<!-- 'salaries_and_fin': {'Mortgage Interest Rate in Percentages (%)': '3.90068965517', 'Average Monthly Disposable Salary (Net After Tax)': '4355.79531915'}
+
+
+ -->
+
+<div id="salary" class="tab-pane fade">
+      <h3>Salary and Mortgage</h3>
+      
+          <img src="http://www.easiestcreditcard.net/wp-content/uploads/2014/03/house-mortgage.jpg" class="img-circle" alt="Cinque Terre" width="304" height="236">
+          <div id="salary_results"></div>
+          <script>
+            $.get("/show_price_chart_data", showSalaryMortgage);
+            function showSalaryMortgage(data){
+                var salaries = data['salaries_and_fin'];
+                for(var k in salaries){ 
+                    $("#salary_results").append("<p>"+k+ ": " +"<b>"+salaries[k]+ "</p>");            
+                       console.log(k, salaries[k]);
+                }                                 
+            };
+         </script>
+
+   </div>
+</div>
+
+
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<!-- Bootstrap tab menu for cost of living prices  -->
+
+
+
+
+{% endblock %}
