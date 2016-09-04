@@ -46,7 +46,7 @@ def show_city_data():
     input_string = request.args.get("zipcode")
    
     if input_string is None:   
-        return redirect("/")
+        return render_template("index_map.html")
 
     ZIPCODE = find_zipcode_from_input(input_string)
     zipcode = ZIPCODE.zip
@@ -124,7 +124,7 @@ def show_school_details():
     #import pdb; pdb.set_trace()
     ZIPCODE = get_global_zipcodeObject()
     if ZIPCODE is None:
-        return redirect("/")
+        return render_template("index_map.html")
 
     zipcode = ZIPCODE.zip
    
@@ -148,7 +148,7 @@ def show_schools_on_map():
 
     ZIPCODE = get_global_zipcodeObject()
     if ZIPCODE is None:
-        return redirect("/")
+        return render_template("index_map.html")
 
     zipcode = ZIPCODE.zip
    
@@ -159,7 +159,7 @@ def show_schools_on_map():
     return jsonify(schools)
 
 
-@app.route("/cost_of_living/")
+@app.route("/cost_of_living")
 def show_cost_of_living():
     """calculate cost of living for city"""
     
@@ -167,7 +167,7 @@ def show_cost_of_living():
 
     ZIPCODE = get_global_zipcodeObject()
     if ZIPCODE is None:
-        return redirect("/")
+        return render_template("index_map.html")
 
     city = find_nearest_city()
     zipcode = ZIPCODE.zip
@@ -235,7 +235,7 @@ def show_price_items_chart():
     """chart for price items"""
     ZIPCODE = get_global_zipcodeObject()
     if ZIPCODE is None:
-        return redirect("/")
+        return render_template("index_map.html")
 
     zipcode = ZIPCODE.zip
     
@@ -325,7 +325,7 @@ def show_crime_rate():
     
     ZIPCODE = get_global_zipcodeObject()
     if ZIPCODE is None:
-        return redirect("/")
+        return render_template("index_map.html")
 
     city = find_nearest_city()
     zipcode = ZIPCODE.zip
@@ -377,7 +377,7 @@ def give_chart_data():
     import math
     ZIPCODE = get_global_zipcodeObject()
     if ZIPCODE is None:
-        return redirect("/")
+        return render_template("index_map.html")
 
     zipcode = ZIPCODE.zip
     crime_data = Crime.query.filter_by(neighborhood_id=zipcode).first()
@@ -506,14 +506,13 @@ def show_compared_data():
     zipcode1 = request.form.get("zipcode1")
     zipcode2 = request.form.get("zipcode2")
     Neighborhood1 = Neighborhood.query.filter_by(neighborhood_id=zipcode1).first()
-    print "NEIGHBORHOOD1!!!!!!!", Neighborhood1
+    
     city1 = Neighborhood1.city
     state1 = Neighborhood1.state 
     Neighborhood2 = Neighborhood.query.filter_by(neighborhood_id=zipcode2).first()
-    print "NEIGHBORHOOD2!!!!!!!", Neighborhood2
+    
     city2 = Neighborhood2.city
-    print "CITY1!!!!!!!", city1
-    print "CITY2!!!!!!!", city2
+    
     state2 = Neighborhood2.state 
 
     return render_template("show_comparison.html", zipcode1=zipcode1, zipcode2=zipcode2, city1=city1, state1=state1, city2=city2, state2=state2)
@@ -591,6 +590,8 @@ if __name__ == "__main__":
     # that we invoke the DebugToolbarExtension
     # app.debug = True
 
+    
+    
     connect_to_db(app)
 
     # Use the DebugToolbar
