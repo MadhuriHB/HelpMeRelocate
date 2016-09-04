@@ -2,7 +2,7 @@
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-
+<script type="text/javascript" src="http://canvasjs.com/assets/script/canvasjs.min.js"></script>
 
 <div class="container">
   <h3>Comparison</h3>
@@ -120,8 +120,8 @@ var state2 = "{{ state2 }}";
 
 
 <div id="schools" class="tab-pane fade in active">
-    <div>
-    <canvas id="schoolBubbleChart"></canvas>
+    <div id="schoolBubbleChart">
+    
     </div>
       <script>
         
@@ -160,7 +160,8 @@ var state2 = "{{ state2 }}";
               school['parent_rating'] = 5;
             }
             dict['y'] = parseInt(school['score']);
-            dict['r'] = parseInt(school['parent_rating'] * 3);
+            dict['z'] = parseInt(school['parent_rating']);
+            dict['name'] = school['name'];
           data1.push(dict);       
         }
             
@@ -169,7 +170,7 @@ var state2 = "{{ state2 }}";
     // Sorting the data
     data1.sort(function(a,b) {return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);});
     for(var i=0; i<data1.length; i++){
-      data1[i]['x'] = i+1;
+      data1[i]['x'] = i+5;
     }
     // console.log(data1[1]['y']);
     // console.log(data1[150]['y']);
@@ -189,8 +190,9 @@ var state2 = "{{ state2 }}";
                school['parent_rating'] = 5;
                
             }
-            dict['r'] = parseInt(school['parent_rating'] * 3);
+            dict['z'] = parseInt(school['parent_rating']);
             dict['y'] = parseInt(school['score']);
+            dict['name'] = school['name'];
           data2.push(dict);       
         }
 
@@ -198,60 +200,80 @@ var state2 = "{{ state2 }}";
       // Sorting the data
      data2.sort(function(a,b) {return (a.y > b.y) ? 1 : ((b.y > a.y) ? -1 : 0);});
      for(var i=0; i<data2.length; i++){
-      data2[i]['x'] = i+1;
+      data2[i]['x'] = i+5;
     }
 
+    // var max_length_x = Math.max(data1.length, data2.length);
+    // maximum: max_length_x,
+
+       var chart = new CanvasJS.Chart("schoolBubbleChart", 
+
+                        {
+                            zoomEnabled: true,
+                            animationEnabled: true,
+                            title: { text: "School Profiles" },
+                            axisX: { title: "Schools",interval: 5, labelFontSize: 10, labelFontColor: "black" },
+                            axisY: { title: "Great Schools Score", maximum: 15, labelFontSize: 10, labelFontColor: "red" },
+                            legend: { verticalAlign: "bottom", horizontalAlign: "left" },                            
+                            data:[
+                                {        
+                                    type: "bubble", 
+                                    color: "#FF75B5",
+                                    legendText: zipcode1+" "+city1+","+state1,
+                                    showInLegend: true,
+                                    legendMarkerType: "circle",
+                                    legendMarkerColor: "#FF75B5",
+                                    toolTipContent: "<strong>School: {name}</strong><br><strong>Score:</strong> {y}/10<br/> <strong>Parent rating:</strong> {z}/5",
+                                    dataPoints: data1
+                                 },
+                                 {        
+                                    type: "bubble", 
+                                    color: "rgba(117, 250, 255, 0.4)",
+                                    legendText: zipcode2+" "+city2+","+state2,
+                                    showInLegend: true,
+                                    legendMarkerType: "circle",
+                                    legendMarkerColor: "rgba(117, 250, 255, 0.4)",
+                                    toolTipContent: "<strong>School: {name}</strong><br><strong>Score:</strong> {y}/10<br/> <strong>Parent rating:</strong> {z}/5",
+                                    dataPoints: data2
+                                 }
+
+                                
+
+                            ]
+                        });
     
-    
-        var canvas = document.getElementById('schoolBubbleChart');
-        var ctx = canvas.getContext("2d");
+            chart.render();
 
-        var data = {
-            datasets: [
-                {
-                    label: zipcode1+" "+city1+", "+state1,
-                    data: data1,
-                    backgroundColor:"#FF6384",
-                    hoverBackgroundColor: "#FF6384"
-                },
 
-                {
-                    label: zipcode2+" "+city2+", "+state2,
-                    data: data2,
-                    backgroundColor:"#3EDF3E",
-                    hoverBackgroundColor: "#3EDF3E"
-                }
 
-                ]
-        };
 
         
-       var myBubbleChart = new Chart(ctx,{
-                        type: 'bubble',
-                        data: data,
-                        options: {
-                          title: { text: 'School profiles', display: 'true' },
+       // var myBubbleChart = new Chart(ctx,{
+       //                  type: 'bubble',
+       //                  data: data,
+       //                  options: {
+       //                    title: { text: 'School profiles', display: 'true' },
                          
 
-                          tooltips: {
-                                      enabled: true,
-                                      mode: 'single',
-                                      callbacks: {
-                                          label: function(tooltipItems, data) { 
+       //                    tooltips: {
+       //                                enabled: true,
+       //                                mode: 'single',
+       //                                callbacks: {
+       //                                    label: function(tooltipItems, data) { 
                                               
-                                              console.log(tooltipItems);
+       //                                        console.log(tooltipItems);
                                               
-                                              return "Score: "+tooltipItems.yLabel;
-                                          }
-                                        }
-                                      },
+       //                                        return "Score: "+tooltipItems.yLabel;
+       //                                    }
+       //                                  }
+       //                                },
 
 
-                           xAxes: [{scaleLabel: { display: 'true', labelString: 'Schools' }}],
-                           yAxes: [{scaleLabel: { display: 'true', labelString: 'Score' }}] 
-                        }
+       //                     xAxes: [{scaleLabel: { display: 'true', labelString: 'Schools' }}],
+       //                     yAxes: [{scaleLabel: { display: 'true', labelString: 'Score' }}] 
+       //                  }
                         
-                    });
+       //              });
 
      }
 
