@@ -41,15 +41,15 @@ class School(db.Model):
 
     school_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     gsid = db.Column(db.Integer)
-    name = db.Column(db.String(200), nullable=False)
+    name = db.Column(db.String(200), nullable=True)
     score = db.Column(db.Float, nullable=True)
     school_type = db.Column(db.String(200), nullable=True)
     grade_range = db.Column(db.String(200), nullable=True)
     parent_rating = db.Column(db.String(15), nullable=True)
     city = db.Column(db.String(100), nullable=False)
     state = db.Column(db.String(100), nullable=False)
-    address = db.Column(db.Text, nullable=False)
-    phone = db.Column(db.String(100), nullable=False)
+    address = db.Column(db.Text, nullable=True)
+    phone = db.Column(db.String(100), nullable=True)
     website = db.Column(db.Text, nullable=True)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
@@ -190,51 +190,108 @@ class Favorites(db.Model):
  
 
 
-# def example_data():
-#     """Create some sample data."""
+def example_data():
+    """Create some sample data."""
 
-#     # In case this is run more than once, empty out existing data
-#     CostOfLiving.query.delete()
-#     User.query.delete()
-#     Crime.query.delete()
-#     PriceItems.query.delete()
-#     Favorites.query.delete()    
-
+    # In case this is run more than once, empty out existing data
     
+    User.query.delete()    
+    PriceItems.query.delete()
+    Favorites.query.delete()    
+    CostOfLiving.query.delete()
+    Neighborhood.query.delete()
+    School.query.delete()
 
-#     # Add sample Users
-#     Madhuri = User(email='Madhuri@yahoo.com', password='Madhuri', zipcode='93012')
-#     Jack = User(email='Jack@gmail.com', password='Jack', zipcode='94111')
-#     Subhash = user(email='Subhash@gmail.com', password='Subhash', zipcode='93010')
-#     Liz = User(email='Liz@hotmail.com', password='Liz', zipcode='80123')
+    # Add sample Users
+    Madhuri = User(email='Madhuri@yahoo.com', password='Madhuri', zipcode='93012')
+    Jack = User(email='Jack@gmail.com', password='Jack', zipcode='94111')
+    Subhash = User(email='Subhash@gmail.com', password='Subhash', zipcode='93010')
+    Liz = User(email='Liz@hotmail.com', password='Liz', zipcode='80123')
 
-#     #Add sample Cost of living
+   
+
+    cost_of_living1 = CostOfLiving(cost_id=1,
+                                  neighborhood_id=93012,
+                                  pollution_index=67,
+                                  traffic_time_index=50,
+                                  groceries_index=70,
+                                  hotel_price_index=90,                                      
+                                  cpi_index=90,
+                                  restaurant_price_index=98,
+                                  property_price_to_income_ratio=45,
+                                  health_care_index=77,
+                                  safety_index=70, 
+                                  crime_index=30, 
+                                  cpi_and_rent_index=56,
+                                  rent_index=98,
+                                  traffic_inefficiency_index=55,
+                                  purchasing_power_incl_rent_index=89,
+                                  raffic_co2_index=45,
+                                  traffic_index=78
+                                  )  
+    cost_of_living2 = CostOfLiving(cost_id=2, neighborhood_id=94111,
+                                  pollution_index=67,
+                                  traffic_time_index=50,
+                                  groceries_index=70,
+                                  hotel_price_index=90,                                      
+                                  cpi_index=90,
+                                  restaurant_price_index=98,
+                                  property_price_to_income_ratio=45,
+                                  health_care_index=77,
+                                  safety_index=70, 
+                                  crime_index=30, 
+                                  cpi_and_rent_index=56,
+                                  rent_index=98,
+                                  traffic_inefficiency_index=55,
+                                  purchasing_power_incl_rent_index=89,
+                                  raffic_co2_index=45,
+                                  traffic_index=78
+                                  )  
 
 
 
 
 
-#     db.session.add_all([Madhuri, Jack, Subhash, Liz])
-#     db.session.commit()
 
 
+    #Add sample Cost of living Prices
+    p1 = PriceItems(cost_id=1, item_id=1, item_name="bread", average_price="2.00", lowest_price="1.00", highest_price="3.00")
+    p2 = PriceItems(cost_id=2, item_id=2, item_name="tomato", average_price="1.00", lowest_price="1.50", highest_price="2.00")
+    
+    n1 = Neighborhood(neighborhood_id=93012, city="Camarillo", state="CA", summary="It is a nice city", climate="warm")
+    n2 = Neighborhood(neighborhood_id=94111, city="San Francisco", state="CA", summary="It is a nice and busy city", climate="cold")
+    
+    f1 = Favorites(user_id=1, neighborhood_id=93012)
+    f2 = Favorites(user_id=2, neighborhood_id=94111)
+
+    image1 = Images(image_url="http://static.panoramio.com/photos/large/12386655.jpg", neighborhood_id=93012)
+    image2 = Images(image_url="http://static.panoramio.com/photos/large/57356554.jpg", neighborhood_id=94111)
+    
+    s1 = School(neighborhood_id=93012, name="La Mariposa", score=9, school_type='public', city="Camarillo", state="CA", latitude=34.2164, longitude=-119.0376)
+    s2 = School(neighborhood_id=94111, name="Las Colinas", score=10, school_type='public', city="San Francisco", state="CA", latitude=34.2164, longitude=-119.0376)
+    
+    db.session.add_all([image1, image2, cost_of_living1, cost_of_living2, n1, n2, s1, s2, f1, f2, p1, p2, Madhuri, Jack, Subhash, Liz])
+    db.session.commit()
 
 
+def connect_to_db(app, db_uri="postgresql:///relocate"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+    db.app = app
+    db.init_app(app)
 
 
 ##############################################################################
 # Helper functions
 
-def connect_to_db(app):
-    """Connect the database to our Flask app."""
+# def connect_to_db(app):
+#     """Connect the database to our Flask app."""
 
-    # Configure to use our PostgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///relocate'
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///testdb'
-    app.config['SQLALCHEMY_ECHO'] = True
-    db.app = app
-    db.init_app(app)
-
+#     # Configure to use our PostgreSQL database
+#     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///relocate'
+# # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///testdb'
+#     app.config['SQLALCHEMY_ECHO'] = True
+#     db.app = app
+#     db.init_app(app)
 
 if __name__ == "__main__":
     # As a convenience, if we run this module interactively, it will leave

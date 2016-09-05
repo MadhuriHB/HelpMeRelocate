@@ -5,35 +5,52 @@
 <script type="text/javascript">
 $("#overview").attr("class", "active")
 $("#home").attr("class", "inactive")
-
 </script>
 
+<style type="text/css">
+  .btn-sm{
+    padding: 13px 16px;
+}
 
+</style>
 
- <h2>{{ city }}, {{ state }} </h2>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="/">Help Me Relocate</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li id="home" class="active"><a href="/search">Search</a></li>
+                <li id="overview"><a href="/show_city?zipcode={{ zipcode }}">Overview</a></li>
+                <li id="school"><a href="/show_school?zipcode={{ zipcode }}">Schools</a></li>  
+                <li id="cost"><a href="/cost_of_living?zipcode={{ zipcode }}">Cost of Living</a></li>
+                <li id="crime"><a href="/crime_rate?zipcode={{ zipcode }}">Safety</a></li>
+            </ul>
 
-<!-- <a href="/show_school"><h3>Show schools</h3></a> <br>
-    <a href="/cost_of_living"><h3>Show Cost of Living</h3></a><br>
-    <a href="/crime_rate"><h3>Show crime rate </h3></a><br> -->
-    <!-- <a href="/show_price_chart"><h3>Show price items</h3></a><br> -->
-
-    <p>{{ summary }}</p> <br><br><br>
-    
-    {% if climate is not none %}
-        <h3>Climate</h3> <br>
-        <p>{{ climate }}</p>
-    {% endif %}
+            <ul class="nav navbar-nav navbar-right">
+             
+             
+            {% if "user_id" in session %}
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/show_favorites">Show Favorites</a></li>
+                <li><button id="favorite" class="btn btn-primary btn-lg" type="submit"> <span id="favorite_star" class="glyphicon glyphicon-star-empty"></span>Favorite</button></li>
+                
+            {% else %}
+                <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        
+           {% endif %}
+            </ul>
+    </div>
+</nav>
 
 <style>
-  .carousel-inner > .item > img,
-
-  .carousel-inner > .item > a > img {
-      width: 60%;
-      margin: auto;
+  .carousel-inner > .item > img{
+    width:640px;
+    height:360px;
+     margin: 0 auto;
   }
 </style>
-<body>
-
 <div class="container">
   <br>
   <div id="myCarousel" class="carousel slide" data-ride="carousel">
@@ -63,50 +80,56 @@ $("#home").attr("class", "inactive")
   </div>
 </div>
     
-    <!-- <a href="/show_school"><h3>Show schools</h3></a> <br>
-    <a href="/cost_of_living"><h3>Show Cost of Living</h3></a><br>
-    <a href="/crime_rate"><h3>Show crime rate </h3></a><br>
-    <a href="/show_price_chart"><h3>Show price items</h3></a><br>
 
-    <h2>About the city >></h2> <br>
+
+
+<h2>{{ city }}, {{ state }} </h2>
+
+    <h3>Summary</h3> <br>
     <p>{{ summary }}</p> <br><br><br>
     
     {% if climate is not none %}
-        <h2>Climate >></h2> <br>
+        <h3>Climate</h3> <br>
         <p>{{ climate }}</p>
     {% endif %}
 
- -->
-   
-        <script type="text/javascript">
 
-            // $(function () { // this is the jquery shortcut for document.ready()
-            //     function addToFavorites(evt) {
-            //         var id = this.id; // this is the id on the button we clicked, which is the image's id
-            //         $.post("/add-to-favorites", {'id': id}, addToFavoritesSuccess);
-            //     }
 
-            //     function addToFavoritesSuccess(result) {
+
+      {% if "user_id" in session %}
+         <button id="favorite" class="btn btn-primary btn-sm" type="submit"> <span id="favorite_star" class="glyphicon glyphicon-star-empty"></span>Favorite</button>
+      {% endif %}
+       <script type="text/javascript">
+         $(function () { // this is the jquery shortcut for document.ready()
+                function addToFavorites(evt) {
+                    var id = this.id; // this is the id on the button we clicked, which is the image's id
+                    $.post("/add-to-favorites", {'id': id, 'zipcode': {{ zipcode }}}, addToFavoritesSuccess);
+                }
+
+                function addToFavoritesSuccess(result) {
                     
-            //         console.log(result.status);
-            //         var id = result.id;
-            //         if (result.status === "added")
-            //         {
-            //         $("#favorite_star").toggleClass('glyphicon-star');
-            //         $("#favorite_star").toggleClass('glyphicon-star-empty');                 
+                    console.log(result.status);
+                    var id = result.id;
+                    if (result.status === "added")
+                    {
+                    $("#favorite_star").toggleClass('glyphicon-star');
+                    $("#favorite_star").toggleClass('glyphicon-star-empty');                 
                    
-            //         }
-            //         else{
+                    }
+                    else{
 
-            //         $("#favorite_star").toggleClass('glyphicon-star-empty');
-            //         $("#favorite_star").toggleClass('glyphicon-star');
+                    $("#favorite_star").toggleClass('glyphicon-star-empty');
+                    $("#favorite_star").toggleClass('glyphicon-star');
                    
-            //         }
+                    }
                    
-            //     }
+                }
 
-            //     $('#favorite').click(addToFavorites);
-            // });
+                $('#favorite').click(addToFavorites);
+            });
+      </script>
 
-        </script>
+
+
+
 {% endblock %}

@@ -11,7 +11,7 @@ from model import connect_to_db, db, School, User, Neighborhood, Images, CostOfL
 from pyzipcode import ZipCodeDatabase
 
 
-from helper import get_global_zipcodeObject, find_zipcode_from_input, get_city_images, get_schools, row2dict 
+from helper import find_zipcode_from_input, get_city_images, get_schools, row2dict 
 from helper import find_nearest_city, get_city_summary, hash_password
 
 import requests
@@ -34,36 +34,42 @@ API_KEY_NUMBEO = os.environ.get("API_KEY_NUMBEO")
 API_KEY_GOOGLE = os.environ.get("API_KEY_GOOGLE")
 
 
+@app.route("/search")
+def show_index_map():
+    return render_template("index_map.html")
+
+
 @app.route('/')
 def index():
     """Homepage."""
-    return render_template("index_map.html")
+    return render_template("homepage.html")
 
 
 @app.route("/show_city")
 def show_city_data():
     
-    input_string = request.args.get("zipcode")
-   
-    if input_string is None:   
-        return render_template("index_map.html")
+    zipcode = request.args.get("zipcode")
 
-    ZIPCODE = find_zipcode_from_input(input_string)
-    zipcode = ZIPCODE.zip
     
+    if zipcode is None:   
+        return render_template("index_map.html")
 
     is_neighborhood_in_db = Neighborhood.query.filter_by(neighborhood_id=zipcode).first()
     #check if neighborhood is already in DB 
     if is_neighborhood_in_db is None:
+       
+        
+        py_zipcode = find_zipcode_from_input(zipcode)
+        city = py_zipcode.city
+        state = py_zipcode.state
+        
         #call function from helper to get images    
-        images = get_city_images()  
+        images = get_city_images(py_zipcode)  
+       
         image_urls = [image['src'] for image in images]
         
-        zipcodeObject = get_global_zipcodeObject()
-        city = zipcodeObject.city
-        state = zipcodeObject.state
         #call function from helper to get summary, climate
-        summary, climate = get_city_summary()
+        summary, climate = get_city_summary(py_zipcode)
         #make neighborhood instance and store in DB
         neighborhood = Neighborhood(neighborhood_id=zipcode, summary=summary, climate=climate, city=city, state=state)
         db.session.add(neighborhood)
@@ -84,54 +90,27 @@ def show_city_data():
         summary = neighborhood.summary
         climate = neighborhood.climate
         images = Images.query.filter_by(neighborhood_id=zipcode).all()
-        image_urls = [image.image_url for image in images]
-            
-    return render_template("show_city_info.html", city=city, state=state, images=image_urls, summary=summary, climate=climate)
-
-
-@app.route("/add-to-favorites", methods=["POST"])
-def add_to_favorites():
-    #import pdb; pdb.set_trace()
-    iD = request.form.get("id")
-
-    #check if user is logged in 
-    if 'user_id' in session.keys(): 
-        user_id = session["user_id"] 
-        ZIPCODE = get_global_zipcodeObject()
-        zipcode = ZIPCODE.zip
-        city = ZIPCODE.city
        
-        #check to see if favorite is already in DB
-        fav_in_db = Favorites.query.filter_by(neighborhood_id=zipcode).first()
-        
-        if fav_in_db is None:
-            #favorite instance to sotre in DB
-            favorite = Favorites(user_id=user_id, neighborhood_id=zipcode)
-            db.session.add(favorite)
-            db.session.commit()
-            flash("%s %s is addded as your Favorite" % (city, zipcode))
-            return jsonify(status="added", id=iD)
-        else:
-            db.session.delete(fav_in_db)
-            db.session.commit()
-            flash("%s %s is deleted from your Favorite" % (city, zipcode))
-            return jsonify(status="deleted", id=iD)
+        image_urls = [image.image_url for image in images]
+
+   
+            
+    return render_template("show_city_info.html", zipcode=zipcode, city=city, state=state, images=image_urls, summary=summary, climate=climate)
 
 
 @app.route("/show_school")
 def show_school_details():
     """shows up to 200 schools within 5 miles of zipcode"""
-    #import pdb; pdb.set_trace()
-    ZIPCODE = get_global_zipcodeObject()
-    if ZIPCODE is None:
-        return render_template("index_map.html")
-
-    zipcode = ZIPCODE.zip
    
-    #zip_lat_lon = {'lat': ZIPCODE.latitude, 'lon': ZIPCODE.longitude}
+    zipcode = request.args.get("zipcode")
+    
+    if zipcode is None:
+        return render_template("index_map.html")
+    
+    py_zipcode = find_zipcode_from_input(zipcode)
     school = School.query.filter_by(neighborhood_id=zipcode).first()
     if school is None:
-        schoolObjects = get_schools()
+        schoolObjects = get_schools(py_zipcode)
         for schoolObject in schoolObjects:
             schoolObject.neighborhood_id = zipcode
             db.session.add(schoolObject)
@@ -139,19 +118,17 @@ def show_school_details():
     else:
         schoolObjects = School.query.filter_by(neighborhood_id=zipcode).all()
 
-    #return render_template("school_details.html", zip_lat_lon=zip_lat_lon, schoolObjects=schoolObjects)
-    return render_template("schools_on_map.html", schoolObjects=schoolObjects)
+    return render_template("schools_on_map.html", schoolObjects=schoolObjects, zipcode=zipcode)
 
 
 @app.route("/school_map_data")
 def show_schools_on_map():
 
-    ZIPCODE = get_global_zipcodeObject()
-    if ZIPCODE is None:
-        return render_template("index_map.html")
+    zipcode = request.args.get("zipcode")
 
-    zipcode = ZIPCODE.zip
-   
+    if zipcode is None:
+        return render_template("index_map.html")
+    
     kwargs = {'neighborhood_id': zipcode, 'school_type': 'public'}
     schoolObjects = School.query.filter_by(**kwargs).all()
     schools_list = [row2dict(schoolObject) for schoolObject in schoolObjects]
@@ -163,17 +140,16 @@ def show_schools_on_map():
 def show_cost_of_living():
     """calculate cost of living for city"""
     
-    
-
-    ZIPCODE = get_global_zipcodeObject()
-    if ZIPCODE is None:
+    zipcode = request.args.get("zipcode")
+    if zipcode is None:
         return render_template("index_map.html")
 
-    city = find_nearest_city()
-    zipcode = ZIPCODE.zip
-    
+    py_zipcode = find_zipcode_from_input(zipcode)
+
+    city = find_nearest_city(py_zipcode)
 
     cost_of_living = CostOfLiving.query.filter_by(neighborhood_id=zipcode).first()
+
     if cost_of_living is None:     
         resp = requests.get("http://numbeo.com/api/city_prices?api_key=%s&city_id=%s" % (API_KEY_NUMBEO, city['city_id']))
         resp = resp.json()
@@ -227,18 +203,15 @@ def show_cost_of_living():
        		price = row2dict(priceObject)
        		prices.append(price)
        
-    return render_template("cost_of_living_chart.html", prices=prices, indexes=resp_indexes)
+    return render_template("cost_of_living_chart.html", zipcode=zipcode,  prices=prices, indexes=resp_indexes)
 
 
 @app.route("/show_price_chart_data")
 def show_price_items_chart():
     """chart for price items"""
-    ZIPCODE = get_global_zipcodeObject()
-    if ZIPCODE is None:
+    zipcode = request.args.get("zipcode")
+    if zipcode is None:
         return render_template("index_map.html")
-
-    zipcode = ZIPCODE.zip
-    
 
     cost_of_living = CostOfLiving.query.filter_by(neighborhood_id=zipcode).first() 
     priceObjects = PriceItems.query.filter_by(cost_id=cost_of_living.cost_id).all()
@@ -301,16 +274,16 @@ def show_price_items_chart():
     return jsonify(prices)
 
 
-@app.route("/show_price_chart")
-def show_price_charts():
-    return render_template("price_chart.html")
+# @app.route("/show_price_chart")
+# def show_price_charts():
+#     return render_template("price_chart.html")
 
 
 @app.route("/cost_of_living-chart-data")
 def show_cost_of_living_chart():
     """bar chart for cost of living"""
-    ZIPCODE = get_global_zipcodeObject()
-    zipcode = ZIPCODE.zip
+    zipcode = request.args.get("zipcode")
+    
     resp_indexes_object = CostOfLiving.query.filter_by(neighborhood_id=zipcode).first()
     resp_indexes = row2dict(resp_indexes_object)
     del resp_indexes['neighborhood_id']
@@ -318,19 +291,18 @@ def show_cost_of_living_chart():
     return jsonify(resp_indexes)
         
 
-@app.route("/crime_rate")
+@app.route("/crime-chart-data")
 def show_crime_rate():
     """show crime rate for the city"""
     
-    
-    ZIPCODE = get_global_zipcodeObject()
-    if ZIPCODE is None:
+    import math
+    zipcode = request.args.get("zipcode")
+    if zipcode is None:
         return render_template("index_map.html")
-
-    city = find_nearest_city()
-    zipcode = ZIPCODE.zip
+    py_zipcode = find_zipcode_from_input(zipcode)
     
-
+    city = find_nearest_city(py_zipcode)
+    
     crime_rate = Crime.query.filter_by(neighborhood_id=zipcode).first()
     if crime_rate is None:
 
@@ -364,25 +336,9 @@ def show_crime_rate():
 
         db.session.add(crime_rate)
         db.session.commit()
-    else:
-        crime_data = Crime.query.filter_by(neighborhood_id=zipcode).first()
-        crime_data = row2dict(crime_data)
-    	
-    return render_template("crime_rate.html")
-
-
-@app.route('/crime-chart-data')
-def give_chart_data():
-    #import pdb; pdb.set_trace()
-    import math
-    ZIPCODE = get_global_zipcodeObject()
-    if ZIPCODE is None:
-        return render_template("index_map.html")
-
-    zipcode = ZIPCODE.zip
+    # else:
     crime_data = Crime.query.filter_by(neighborhood_id=zipcode).first()
     crime_data = row2dict(crime_data)
-
     del crime_data['city_id']
     del crime_data['neighborhood_id']
     del crime_data['crime_id']
@@ -411,9 +367,16 @@ def give_chart_data():
                       }
     
     new_dict = dict((new_crime_data[key], value) for (key, value) in crime_data.items())
-
-   
+    print "NEW DICTIONARY!!!!!!!!", new_dict
     return jsonify(new_dict)
+
+    	
+@app.route('/crime_rate')
+def show_crime_page():
+    zipcode = request.args.get("zipcode")
+    if zipcode is None:
+        return render_template("index_map.html")
+    return render_template("crime_rate.html", zipcode=zipcode)
 
 
 @app.route('/register', methods=['GET'])
@@ -426,7 +389,7 @@ def register_form():
 @app.route('/register', methods=['POST'])
 def register_process():
     """Process registration."""
-    #import pdb; pdb.set_trace()
+    
     # Get form variables
     email = request.form.get("email")
     password = request.form.get("password")
@@ -439,7 +402,7 @@ def register_process():
     db.session.add(new_user)
     db.session.commit()
 
-    flash("Hi %s! Welcome to Help Me Relocate." % email)
+    flash("Welcome to Help Me Relocate!")
     return redirect("/")
 
 
@@ -470,7 +433,7 @@ def login_process():
 
     session["user_id"] = user.user_id
 
-    # flash("You are now Logged in")
+    flash("You are now Logged in")
     return redirect("/")
 
 
@@ -479,11 +442,40 @@ def logout():
     """Log out."""
 
     del session["user_id"]
-    # flash("Logged Out.")
+    flash("You are now logged Out.")
     return redirect("/")
 
 
+
+@app.route("/add-to-favorites", methods=["POST"])
+def add_to_favorites():
     
+    iD = request.form.get("id")
+    zipcode = request.form.get("zipcode")
+
+    #check if user is logged in 
+    if 'user_id' in session.keys(): 
+        user_id = session["user_id"] 
+        py_zipcode = find_zipcode_from_input(zipcode)
+        city = py_zipcode.city
+       
+        #check to see if favorite is already in DB
+        fav_in_db = Favorites.query.filter_by(neighborhood_id=zipcode).first()
+        
+        if fav_in_db is None:
+            #favorite instance to sotre in DB
+            favorite = Favorites(user_id=user_id, neighborhood_id=zipcode)
+            db.session.add(favorite)
+            db.session.commit()
+            flash("%s %s is addded as your Favorite" % (city, zipcode))
+            return jsonify(status="added", id=iD)
+        else:
+            db.session.delete(fav_in_db)
+            db.session.commit()
+            flash("%s %s is deleted from your Favorite" % (city, zipcode))
+            return jsonify(status="deleted", id=iD)
+
+
 @app.route('/show_favorites')
 def show_neighborhoods():
     """compare up to three neighborhoods"""
@@ -590,8 +582,6 @@ if __name__ == "__main__":
     # that we invoke the DebugToolbarExtension
     # app.debug = True
 
-    
-    
     connect_to_db(app)
 
     # Use the DebugToolbar

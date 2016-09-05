@@ -26,94 +26,97 @@ $("#home").attr("class", "inactive")
     <li><a data-toggle="tab" href="#salary">Salaries and Finance</a></li>
   </ul>
 
-  <div class="tab-content">
-    <div id="home" class="tab-pane fade in active">
-      <h3>HOME</h3>
-      <canvas id="barChart"  width="700" height="400"></canvas>
-      <script>
+          <div class="tab-content">
+            <div id="home" class="tab-pane fade in active">
+              <h3>Cost of Living</h3>
+              <div>
+              <canvas id="barChart"  width="700" height="400"></canvas>
+             </div>
+              
+              <script>
 
 
-       $.get("/cost_of_living-chart-data", makeBarChart);
-        function makeBarChart(data){
-        var labels = []
-        var input_data = []
-       
-        for(var k in data){ 
-            labels.push(k);
-            input_data.push(data[k]);
-        }
-      
-        var canvas = document.getElementById('barChart');
-        var ctx = canvas.getContext("2d");
-
-        var data = {
-            labels: labels,
-
-            datasets: [
-                {
-                    label: "Cost of living",
-
-                    backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(72, 228, 228, 0.2)',
-                'rgba(201, 27, 114, 0.2)',
-                'rgba(43, 236, 47, 0.2)',
-                'rgba(99, 97, 239, 0.2)',
-                'rgba(35, 171, 229, 0.2)',
-                'rgba(95, 39, 225, 0.2)',
-                'rgba(235, 64, 29, 0.2)',
-                'rgba(186, 23, 158, 0.2)',
-                'rgba(57, 213, 161, 0.2)',
-                'rgba(115, 20, 163, 0.2)'
-
-                 ],
-                 borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(72, 228, 228, 1)',
-                'rgba(201, 27, 114, 1)',
-                'rgba(43, 236, 47, 1)',
-                'rgba(99, 97, 239, 1)',
-                'rgba(35, 171, 229, 1)',
-                'rgba(95, 39, 225, 1)',
-                'rgba(235, 64, 29, 1)',
-                'rgba(186, 23, 158, 1)',
-                'rgba(57, 213, 161, 1)',
-                'rgba(115, 20, 163, 1)'
-
-                ],
-                borderWidth: 1,
-                data: input_data
+               $.get("/cost_of_living-chart-data?zipcode={{ zipcode }}", makeBarChart);
+                function makeBarChart(data){
+                var labels = []
+                var input_data = []
+               
+                for(var k in data){ 
+                    labels.push(k);
+                    input_data.push(data[k]);
                 }
-            ]
+              
+                var canvas = document.getElementById('barChart');
+                var ctx = canvas.getContext("2d");
+                console.log(input_data);
 
-        };
+                var data = {
+                    labels: labels,
 
-        var mybarChart = new Chart(ctx, {
-            type: 'bar',
-            data: data
-        
-        }); 
+                    datasets: [
+                        {
+                            label: "Cost of living",
 
-    }
+                            backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(72, 228, 228, 0.2)',
+                        'rgba(201, 27, 114, 0.2)',
+                        'rgba(43, 236, 47, 0.2)',
+                        'rgba(99, 97, 239, 0.2)',
+                        'rgba(35, 171, 229, 0.2)',
+                        'rgba(95, 39, 225, 0.2)',
+                        'rgba(235, 64, 29, 0.2)',
+                        'rgba(186, 23, 158, 0.2)',
+                        'rgba(57, 213, 161, 0.2)',
+                        'rgba(115, 20, 163, 0.2)'
 
-    </script>
-</div>
+                         ],
+                         borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(72, 228, 228, 1)',
+                        'rgba(201, 27, 114, 1)',
+                        'rgba(43, 236, 47, 1)',
+                        'rgba(99, 97, 239, 1)',
+                        'rgba(35, 171, 229, 1)',
+                        'rgba(95, 39, 225, 1)',
+                        'rgba(235, 64, 29, 1)',
+                        'rgba(186, 23, 158, 1)',
+                        'rgba(57, 213, 161, 1)',
+                        'rgba(115, 20, 163, 1)'
+
+                        ],
+                        borderWidth: 1,
+                        data: input_data
+                        }
+                    ]
+
+                };
+
+                var mybarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: data
+                
+                }); 
+
+            }
+
+            </script>
 
 
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
-<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script> -->
+        </div>
 
-<!-- restaurant tab starts here -->
+
+
     <div id="restaurants" class="tab-pane fade">
       <h3>Restaurants</h3>
         <div>
@@ -121,7 +124,7 @@ $("#home").attr("class", "inactive")
         </div>
         <script>
             console.log("IN THE SCRPIT")
-            $.get("/show_price_chart_data", makePriceBarChart);
+            $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = []
                 var input_data = []
@@ -182,8 +185,8 @@ $("#home").attr("class", "inactive")
 
     </script>
 </div>
-<!-- restaurant tab ends here -->
-<!-- clothing tab starts here -->
+    <!-- restaurant tab ends here
+    clothing tab starts here -->
 
     <div id="clothing" class="tab-pane fade">
       <h3>Clothing and Shoes</h3>
@@ -191,7 +194,7 @@ $("#home").attr("class", "inactive")
         <canvas id="clothing-bar-Chart" width="200" height="100"></canvas>
         <script>
             console.log("IN THE SCRPIT")
-            $.get("/show_price_chart_data", makePriceBarChart);
+            $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = []
                 var input_data = []
@@ -262,7 +265,7 @@ $("#home").attr("class", "inactive")
         <canvas id="market-bar-Chart" width="200" height="100"></canvas>
         <script>
             console.log("IN THE SCRPIT")
-            $.get("/show_price_chart_data", makePriceBarChart);
+            $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = []
                 var input_data = []
@@ -334,7 +337,7 @@ $("#home").attr("class", "inactive")
         <canvas id="transportation-bar-Chart" width="200" height="100"></canvas>
         <script>
             console.log("IN THE SCRPIT")
-            $.get("/show_price_chart_data", makePriceBarChart);
+            $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = [];
                 var input_data = [];
@@ -394,13 +397,12 @@ $("#home").attr("class", "inactive")
 
 
 <!-- Rent tab starts here -->
-
     <div id="rent" class="tab-pane fade">
       <h3>Rent Per Month</h3>
         <canvas id="rent-bar-Chart" width="200" height="100"></canvas>
         <script>
             console.log("IN THE SCRPIT")
-            $.get("/show_price_chart_data", makePriceBarChart);
+            $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = [];
                 var input_data = [];
@@ -438,20 +440,23 @@ $("#home").attr("class", "inactive")
                     options: {
                              scales:{
                                 yAxes: [{
-                                        stacked: true,
+                                        // stacked: true,
                                         gridLines: {
                                         display: false
                                         }
 
                                         }],
                                 xAxes: [{
-                                        stacked: true,
+                                        // stacked: true,
                                         gridLines: {
                                         display: false
                                         }
 
                                         }]
                                     }
+                        
+
+
                                 }
 
                 }); 
@@ -459,7 +464,7 @@ $("#home").attr("class", "inactive")
         }
 
        </script>    
-    </div>
+    </div> -->
 <!-- Rent tab ends here -->
 
 
@@ -469,8 +474,8 @@ $("#home").attr("class", "inactive")
       <h3>Buying Apartment</h3>
         <canvas id="buyApt-bar-Chart" width="200" height="100"></canvas>
         <script>
-            console.log("IN THE SCRPIT")
-            $.get("/show_price_chart_data", makePriceBarChart);
+            
+            $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = [];
                 var input_data = [];
@@ -484,6 +489,8 @@ $("#home").attr("class", "inactive")
 
                 var data = {
                     labels: labels,
+                
+
 
                     datasets: [
                             {
@@ -526,8 +533,8 @@ $("#home").attr("class", "inactive")
 
        </script>    
     </div>
-<!-- Buy Apartment tab ends here -->
-
+<!-- Buy Apartment tab ends here
+ -->
 <!-- Buy Apartment tab starts here -->
 
     <div id="sports" class="tab-pane fade">
@@ -537,7 +544,7 @@ $("#home").attr("class", "inactive")
         </div>
         <script>
             console.log("IN THE SCRPIT")
-            $.get("/show_price_chart_data", makePriceBarChart);
+            $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = [];
                 var input_data = [];
@@ -592,15 +599,9 @@ $("#home").attr("class", "inactive")
         }
 
        </script>    
-    </div>
+    </div> 
 
 <!-- Sports and Leisure ends here -->
-
- 
-<!-- 'salaries_and_fin': {'Mortgage Interest Rate in Percentages (%)': '3.90068965517', 'Average Monthly Disposable Salary (Net After Tax)': '4355.79531915'}
-
-
- -->
 
 <div id="salary" class="tab-pane fade">
       <h3>Salary and Mortgage</h3>
@@ -608,7 +609,7 @@ $("#home").attr("class", "inactive")
           <img src="http://www.easiestcreditcard.net/wp-content/uploads/2014/03/house-mortgage.jpg" class="img-circle" alt="Cinque Terre" width="304" height="236">
           <div id="salary_results"></div>
           <script>
-            $.get("/show_price_chart_data", showSalaryMortgage);
+            $.get("/show_price_chart_data?zipcode={{ zipcode }}", showSalaryMortgage);
             function showSalaryMortgage(data){
                 var salaries = data['salaries_and_fin'];
                 for(var k in salaries){ 
@@ -629,6 +630,38 @@ $("#home").attr("class", "inactive")
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 <!-- Bootstrap tab menu for cost of living prices  -->
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="/">Help Me Relocate</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li id="home" class="active"><a href="/search">Search</a></li>
+                <li id="overview"><a href="/show_city?zipcode={{ zipcode }}">Overview</a></li>
+                <li id="school"><a href="/show_school?zipcode={{ zipcode }}">Schools</a></li>  
+                <li id="cost"><a href="/cost_of_living?zipcode={{ zipcode }}">Cost of Living</a></li>
+                <li id="crime"><a href="/crime_rate?zipcode={{ zipcode }}">Safety</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+             
+             
+            {% if "user_id" in session %}
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/show_favorites">Show Favorites</a></li>
+                <li><button id="favorite" class="btn btn-primary" type="submit"> <span id="favorite_star" class="glyphicon glyphicon-star-empty"></span>Favorite</button></li>
+                
+            {% else %}
+                <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        
+           {% endif %}
+            </ul>
+    </div>
+</nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 
 

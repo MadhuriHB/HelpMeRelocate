@@ -1,4 +1,4 @@
-ZIPCODE = None
+
 
 from pyzipcode import ZipCodeDatabase
 import bs4
@@ -10,43 +10,31 @@ import requests
 import os
 from model import Images
 from states import get_state_full_name
-#API_KEY = os.environ.get("API_KEY")
+
 API_KEY_GS = os.environ.get("api_key_gs")
 API_KEY_NUMBEO = os.environ.get("API_KEY_NUMBEO")
 
 
-def get_global_zipcodeObject():
-    return ZIPCODE 
-
-
 def find_zipcode_from_input(input_string):
-    
-    global ZIPCODE
-    ZIPCODE = None
-
     zcdb = ZipCodeDatabase() 
 
     input_string.strip()
 
-    ZIPCODE = zcdb[input_string]
+    py_zipcode = zcdb[input_string]
 
-    return ZIPCODE
+    return py_zipcode
 
 
-def get_city_images():
-    #import pdb; pdb.set_trace()
-    
+def get_city_images(py_zipcode):
     images = []
-    #print "This is ZIPCODE in IMAGES ", ZIPCODE.zip
-    lat = ZIPCODE.latitude
-    lon = ZIPCODE.longitude
+    lat = py_zipcode.latitude
+    lon = py_zipcode.longitude
    
     min_lat = float(lat) - 0.01
     min_lon = float(lon) - 0.01
     max_lat = float(lat) + 0.01
     max_lon = float(lon) + 0.01
-    # print "LATITUDE ", lat
-    # print "LONGITUDE!!!!!!!!!!", lon
+   
     resp = requests.get(
         "http://www.panoramio.com/map/get_panoramas.php?set=public&from=0&to=10&minx=%s&miny=%s&maxx=%s&maxy=%s&size=medium&mapfilter=true"
         % (min_lon, min_lat, max_lon, max_lat))
@@ -65,15 +53,13 @@ def get_city_images():
     return images
 
 
-def get_city_summary():
+def get_city_summary(py_zipcode):
     """ get summary and climate from wikipedia """
     #import pdb; pdb.set_trace()
     # Wikipedia is a wrapper on wikipedia API 
     import wikipedia
-
-    global ZIPCODE
-    city = ZIPCODE.city
-    state = ZIPCODE.state
+    city = py_zipcode.city
+    state = py_zipcode.state
     # state_abbr = ZIPCODE.state
     # state_full_name = get_state_full_name(state_abbr)
     page = wikipedia.page(city + " " + state)
@@ -97,10 +83,10 @@ def get_school_rating(tempSchoolObject):
     state = tempSchoolObject.state
     gsid = tempSchoolObject.gsid
     
-    #import pdb; pdb.set_trace()
+   
     
     resp = requests.get("http://api.greatschools.org/school/tests/%s/%s?key=%s" % (state, gsid, API_KEY_GS))  
-    #resp = resp.text
+   
     resp = resp.text
     #Parse the api response string using xml_dom
     
@@ -122,13 +108,13 @@ def get_school_rating(tempSchoolObject):
     return tempSchoolObject
 
 
-def get_schools():
+def get_schools(py_zipcode):
     #get schools for the zipcode
     #from django.utils.encoding import smart_str, smart_unicode
     #import pdb; pdb.set_trace()
-    global ZIPCODE
-    state = ZIPCODE.state
-    zipcode = ZIPCODE.zip
+    
+    state = py_zipcode.state
+    zipcode = py_zipcode.zip
     #Api call to get school information
     resp = requests.get("http://api.greatschools.org/schools/nearby?key=%s&state=%s&zip=%s" % (API_KEY_GS, state, zipcode))
     
@@ -177,19 +163,17 @@ def get_schools():
     return schoolObjects 
 
 
-def find_nearest_city():
+def find_nearest_city(py_zipcode):
     """finds the nearest big city for the user city
        to find cost of living
     """
-   
-    ZIPCODE = get_global_zipcodeObject()
-    if ZIPCODE is None:
+    if py_zipcode is None:
         return None
 
     from geopy.distance import vincenty
     
-    myCitylat = ZIPCODE.latitude
-    myCitylon = ZIPCODE.longitude
+    myCitylat = py_zipcode.latitude
+    myCitylon = py_zipcode.longitude
     
     #stores all city objects in US 
     cityObjects = []
@@ -210,11 +194,8 @@ def find_nearest_city():
     #city for the zipcode that user entered
     myCity = (myCitylat, myCitylon)
 
-    
     for cityObject in cityObjects:
-       
-
-        #city lat and long from citiobject that we are comparing
+    #city lat and long from citiobject that we are comparing
         latitude = cityObject.get('latitude')
         longitude = cityObject.get('longitude')
         if latitude is not None and longitude is not None:

@@ -62,7 +62,7 @@
                       body.html(result);
                   });
 
-                    }          
+                }          
                           else
                           {
                               alert("No results found");
@@ -73,18 +73,17 @@
                     alert("Geocoder failed due to: " + status);
                 }
                
-              $.get("/show_city?zipcode="+zipcode);
-
-
         });
+    
+    }
 
-      } 
-        google.maps.event.addDomListener(window,'load', initialize);
+  google.maps.event.addDomListener(window,'load', initialize);
 
-  </script>
+
+</script>
 
  
-  <div id="googleMap" style="width:1200px;height:400px;"></div>
+<div id="googleMap" style="width:1200px;height:400px;"></div>
 
  
 

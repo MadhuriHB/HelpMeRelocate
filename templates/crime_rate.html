@@ -1,22 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
+<h2>Crime rate</h2>
 <script type="text/javascript">
 $("#crime").attr("class", "active")
 $("#home").attr("class", "inactive")
-
 </script>
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
-
 <canvas id="radarChart"></canvas>
-
-
 <script>
     
-    $.get("/crime-chart-data", makeRadarChart);
+    $.get("/crime-chart-data?zipcode={{ zipcode }}", makeRadarChart);
     function makeRadarChart(data){
         var labels = []
         var input_data = []
@@ -59,6 +55,40 @@ $("#home").attr("class", "inactive")
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="/">Help Me Relocate</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li id="home" class="active"><a href="/search">Search</a></li>
+                <li id="overview"><a href="/show_city?zipcode={{ zipcode }}">Overview</a></li>
+                <li id="school"><a href="/show_school?zipcode={{ zipcode }}">Schools</a></li>  
+                <li id="cost"><a href="/cost_of_living?zipcode={{ zipcode }}">Cost of Living</a></li>
+                <li id="crime"><a href="/crime_rate?zipcode={{ zipcode }}">Safety</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+             
+             
+            {% if "user_id" in session %}
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/show_favorites">Show Favorites</a></li>
+                <li><button id="favorite" class="btn btn-primary" type="submit"> <span id="favorite_star" class="glyphicon glyphicon-star-empty"></span>Favorite</button></li>
+                
+            {% else %}
+                <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        
+           {% endif %}
+            </ul>
+    </div>
+</nav>
+
+
 
 
 {% endblock %}
