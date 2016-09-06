@@ -23,6 +23,11 @@ You can also:
 
 > Clear and simple page which shows images and a short info about the city and climate.
 
+City: 
+ 
+ ![City]("/static/images/show_city.png")
+
+
 > Schools are shown on map with marker for each school showing school name, address and school score. Also, a table to access other details of school, like parent rating, website url etc.
 
 > Cost of living page shows a simple and clean chart which shows different indices for the neighborhood.
