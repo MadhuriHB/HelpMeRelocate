@@ -2,7 +2,25 @@
 
 {% block content%}
 
-    <h3><center>Click On The Neighborhood</center></h3><br><br><br>
+<style type="text/css">
+
+      .btn-lg {
+          padding: 10px 10px;
+      }
+      .carousel-inner > .item > img{
+        width:640px;
+        height:360px;
+         margin: 0 auto;
+      }
+     body {
+            background-image: url("/static/images/shattered.png");
+      }
+
+</style>
+    
+
+
+    <!-- <h3><center>Click On The Neighborhood</center></h3><br><br><br> -->
     <script>
  
         function initialize() {
@@ -82,9 +100,9 @@
 
 </script>
 
- 
-<div id="googleMap" style="width:1200px;height:400px;"></div>
+<h3 align="center">Click on the neighborhood</h3><br>
+<div id="googleMap" style="width:1200px; height: 500px; margin:0 auto;"></div>
 
- 
+
 
 {% endblock %}   

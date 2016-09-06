@@ -15,8 +15,13 @@ $("#home").attr("class", "inactive")
 
 </script>
 
+<style type="text/css">
+body {
+            background-image: url("/static/images/shattered.png");
+      }
+</style>
 
-<div id="googleMap" style="width:1200px;height:400px;"></div>
+<div id="googleMap" style="width:1200px; height:400px; margin:0 auto"></div>
 <script>    
     var zipcode = {{ zipcode }};
     $.get("/school_map_data?zipcode="+zipcode, initialize)
@@ -97,7 +102,7 @@ $("#home").attr("class", "inactive")
 
 
 <div class="container">
-  <h2>Schools in this neighborhood</h2>
+  <h3 align="center">Schools in {{ schoolObjects[0].city }}, {{schoolObjects[0].state}},&nbsp;{{ zipcode }} </h3>
    <table class="table table-condensed pagination"> 
   
         <thead>
@@ -164,7 +169,8 @@ $("#home").attr("class", "inactive")
             {% if "user_id" in session %}
                 <li><a href="/logout">Logout</a></li>
                 <li><a href="/show_favorites">Show Favorites</a></li>
-                <li><button id="favorite" class="btn btn-primary" type="submit"> <span id="favorite_star" class="glyphicon glyphicon-star-empty"></span>Favorite</button></li>
+                <li><a id="favorite"><span id="favorite_star" class="glyphicon glyphicon-star-empty"></span></a></li>
+                <!-- <li><button id="favorite" class="btn btn-primary" type="submit"> <span id="favorite_star" class="glyphicon glyphicon-star-empty"></span>Favorite</button></li> -->
                 
             {% else %}
                 <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
