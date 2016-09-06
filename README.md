@@ -22,7 +22,7 @@ You can also:
 
 > Easy click on the google map to search the neighborhoods.
 
-![Help Me Relocate Homepage](/static/images/"homepage.png")
+![Help Me Relocate Homepage](/static/images/homepage.png)
 
 > Clear and simple page which shows images and a short info about the city and climate.
 
