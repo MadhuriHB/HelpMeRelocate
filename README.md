@@ -22,7 +22,7 @@ You can also:
 
 > Easy click on the google map to search the neighborhoods.
 
-![Help Me Relocate Homepage](/static/images/homepage.png)
+![Help Me Relocate Homepage](/static/images/homepage_new.png)
 
 > Clear and simple page which shows images and a short info about the city and climate.
 
@@ -45,7 +45,7 @@ You can also:
 
 >Comparison page shows user's favorite neighborhoods and selecting two neighborhoods, compares them by cost of living and shows it on a bar chart. 
 
-![Help Me Relocate Comparison page](/static/images/compare_cost.png)
+![Help Me Relocate Comparison page](/static/images/compare_cost_new.png)
 
 >Schools are also compared for the two neighborhoods by scores and parent ratings  and shown on bubble chart.
 

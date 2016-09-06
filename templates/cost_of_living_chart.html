@@ -13,7 +13,7 @@ $("#home").attr("class", "inactive")
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 <div class="container">
-  <h2>Cost Of Living</h2>
+  <h2 align="center">Cost Of Living</h2>
   <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#cost">Cost Indices</a></li>
     <li><a data-toggle="tab" href="#restaurants">Restaurants</a></li>
@@ -28,7 +28,7 @@ $("#home").attr("class", "inactive")
 
           <div class="tab-content" width="100%">
             <div id="cost" class="tab-pane fade in active">
-              <h3>HOME</h3>
+              <h3>Cost Indices</h3>
               <canvas id="barChart"  width="700" height="400"></canvas>
               <script>
 
@@ -52,7 +52,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                         {
-                            label: "Cost of living",
+                            label: {{ zipcode }},
 
                             backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
@@ -121,7 +121,7 @@ $("#home").attr("class", "inactive")
         <canvas id="restaurant-bar-Chart"  width="200" height="100"></canvas>
         </div>
         <script>
-            console.log("IN THE SCRPIT")
+            
             $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = []

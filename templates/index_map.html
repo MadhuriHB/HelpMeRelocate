@@ -12,10 +12,7 @@
         height:360px;
          margin: 0 auto;
       }
-     body {
-            background-image: url("/static/images/shattered.png");
-      }
-
+    
 </style>
     
 
@@ -74,7 +71,7 @@
                             }
                         }
                   
-                  var response = confirm("The Neighborhood you clicked is "+zipcode);
+                  var response = confirm("Would you like to start a search for the zipcode "+zipcode);
                   if(response === true){
                   $.get("/show_city?zipcode="+zipcode, function(result){
                       var body = $("body");
@@ -85,7 +82,7 @@
                 }          
                           else
                           {
-                              alert("No results found");
+                              alert("Sorry. No results found");
                           }
                 }
                 else
