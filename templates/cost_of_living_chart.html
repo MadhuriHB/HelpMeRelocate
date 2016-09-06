@@ -12,50 +12,25 @@ $("#home").attr("class", "inactive")
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
-<style type="text/css">
-    .canvas{
-        margin:10px; padding:10px;
-    }
-</style>
+<div class="container">
+  <h2>Cost Of Living</h2>
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#cost">Cost Indices</a></li>
+    <li><a data-toggle="tab" href="#restaurants">Restaurants</a></li>
+    <li><a data-toggle="tab" href="#clothing">Clothing and Shoes</a></li>
+    <li><a data-toggle="tab" href="#markets">Markets</a></li>
+    <li><a data-toggle="tab" href="#transportation">Transportation</a></li>
+    <li><a data-toggle="tab" href="#sports">Sports and Leisure</a></li>
+    <li><a data-toggle="tab" href="#rent">Rent per Month</a></li>
+    <li><a data-toggle="tab" href="#buy_apt">Buying Apartments</a></li>
+    <li><a data-toggle="tab" href="#salary">Salaries and Finance</a></li>
+  </ul>
 
-<div id="cost-living">
-  <canvas id="barChart"  width="700" height="400"></canvas>
-</div>
-
-<div  id="price-items" class="container-fluid">
-        <div class="row">
-          <div class="col-md-4">
-            <canvas id="restaurant-bar-Chart" class="canvas"></canvas>
-          </div>
-          <div class="col-md-4">
-            <canvas id="clothing-bar-Chart" class="canvas"></canvas>
-          </div>
-          <div class="col-md-4">
-             <canvas id="market-bar-Chart" class="canvas"></canvas>
-          </div>
-        
-        </div>
-        <div class="row">
-          <div class="col-md-4">
-            <canvas id="transportation-bar-Chart" class="canvas"></canvas>
-          </div>
-          <div class="col-md-4">
-            <canvas id="rent-bar-Chart" class="canvas"></canvas>
-          </div>
-          <div class="col-md-4">
-             <canvas id="buyApt-bar-Chart" class="canvas"></canvas>
-          </div>
-        
-        </div>
-</div>
-
-
-
-
-
-
-              
-<script>
+          <div class="tab-content" width="100%">
+            <div id="cost" class="tab-pane fade in active">
+              <h3>HOME</h3>
+              <canvas id="barChart"  width="700" height="400"></canvas>
+              <script>
 
 
                $.get("/cost_of_living-chart-data?zipcode={{ zipcode }}", makeBarChart);
@@ -63,8 +38,7 @@ $("#home").attr("class", "inactive")
                 var labels = []
                 var input_data = []
                
-                for(var k in data){
-                    
+                for(var k in data){ 
                     labels.push(k);
                     input_data.push(data[k]);
                 }
@@ -78,7 +52,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                         {
-                            label: {{ zipcode }},
+                            label: "Cost of living",
 
                             backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
@@ -127,50 +101,34 @@ $("#home").attr("class", "inactive")
 
                 var mybarChart = new Chart(ctx, {
                     type: 'bar',
-                    data: data,
-                    options: {
-                             scales:{
-                                yAxes: [{
-
-                                        stacked: true,
-                                        gridLines: {
-                                        display: false
-                                        }
-
-                                        }],
-                                xAxes: [{
-                                        // ticks: {
-                                        //     display: false
-                                        // },
-                                        // display: false,
-                                        stacked: true,
-                                        gridLines: {
-                                        display: false
-                                        }
-
-                                        }],
-                                
-                                    }
-                                }
+                    data: data
                 
                 }); 
 
             }
 
-</script>
+            </script>
+        </div>
 
 
-     
-<div>
-<script>
-            
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script> -->
+
+<!-- restaurant tab starts here -->
+    <div id="restaurants" class="tab-pane fade">
+      <h3>Restaurants</h3>
+        <div>
+        <canvas id="restaurant-bar-Chart"  width="200" height="100"></canvas>
+        </div>
+        <script>
+            console.log("IN THE SCRPIT")
             $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = []
                 var input_data = []
                 var restaurants = data['restaurants']
                 for(var k in restaurants){ 
-                    // k = k.split("(")[0];
+
                     labels.push(k);
                     input_data.push(restaurants[k]);
                 }
@@ -184,7 +142,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                         {
-                            label: "Restaurant prices",
+                            label: "Average Price in USD",
 
                             backgroundColor: 'rgb(49, 205, 127)',
                          
@@ -203,25 +161,19 @@ $("#home").attr("class", "inactive")
                     options: {
                              scales:{
                                 yAxes: [{
-
                                         stacked: true,
                                         gridLines: {
-                                        display: false
+                                            display: false
                                         }
 
                                         }],
                                 xAxes: [{
-                                        ticks: {
-                                            display: false
-                                        },
-                                        // display: false,
                                         stacked: true,
                                         gridLines: {
-                                        display: false
+                                            display: false
                                         }
 
-                                        }],
-                                
+                                        }]
                                     }
                                 }
 
@@ -229,19 +181,24 @@ $("#home").attr("class", "inactive")
 
         }
 
-</script>
+    </script>
+</div>
+<!-- restaurant tab ends here -->
+<!-- clothing tab starts here -->
 
+    <div id="clothing" class="tab-pane fade">
+      <h3>Clothing and Shoes</h3>
 
-
-<script>
-           
+        <canvas id="clothing-bar-Chart" width="200" height="100"></canvas>
+        <script>
+            console.log("IN THE SCRPIT")
             $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = []
                 var input_data = []
                 var clothing = data['clothing_and_shoes']
                 for(var k in clothing){ 
-                    // k = k.split("(")[0];
+
                     labels.push(k);
                     input_data.push(clothing[k]);
                 }
@@ -255,7 +212,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                         {
-                            label: "Clothing and Shoes",
+                            label: "Average Price in USD",
 
                             backgroundColor: 'rgb(49, 205, 127)',
                          
@@ -281,9 +238,6 @@ $("#home").attr("class", "inactive")
 
                                         }],
                                 xAxes: [{
-                                        ticks: {
-                                            display: false
-                                        },
                                         stacked: true,
                                         gridLines: {
                                             display: false
@@ -297,17 +251,25 @@ $("#home").attr("class", "inactive")
 
         }
 
-</script>    
+    </script>    
+</div>
 
-<script>
-           
+<!-- clothing tab ends here -->
+
+<!-- market tab starts here   -->
+
+    <div id="markets" class="tab-pane fade">
+      <h3>Markets</h3>
+        <canvas id="market-bar-Chart" width="200" height="100"></canvas>
+        <script>
+            console.log("IN THE SCRPIT")
             $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = []
                 var input_data = []
                 var markets = data['markets']
                 for(var k in markets){ 
-                    // k = k.split("(")[0];
+
                     labels.push(k);
                     input_data.push(markets[k]);
                 }
@@ -321,7 +283,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                         {
-                            label: "Market prices",
+                            label: "Average Price in USD",
 
                             backgroundColor: 'rgb(49, 205, 127)',
                          
@@ -339,8 +301,6 @@ $("#home").attr("class", "inactive")
                     data: data,
                     options: {
                              scales:{
-
-                                        
                                 yAxes: [{
                                         stacked: true,
                                         gridLines: {
@@ -349,14 +309,7 @@ $("#home").attr("class", "inactive")
 
                                         }],
                                 xAxes: [{
-
-                                        ticks: {
-
-                                            display: false
-                                        },
-
                                         stacked: true,
-
                                         gridLines: {
                                             display: false
                                         }
@@ -369,18 +322,25 @@ $("#home").attr("class", "inactive")
 
         }
 
-</script>    
+        </script>    
 
+    </div>
 
-<script>
-           
+<!-- market tab ends here -->
+
+<!-- Transportation tab starts here -->
+
+    <div id="transportation" class="tab-pane fade">
+      <h3>Transportation</h3>
+        <canvas id="transportation-bar-Chart" width="200" height="100"></canvas>
+        <script>
+            console.log("IN THE SCRPIT")
             $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = [];
                 var input_data = [];
                 var transportation = data['transportation'];
                 for(var k in transportation){ 
-                    // k = k.split("(")[0];
                     labels.push(k);
                     input_data.push(transportation[k]);
                 }                                 
@@ -392,7 +352,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                             {
-                            label: "Transportation",
+                            label: "Average Price in USD",
 
                             backgroundColor: 'rgb(49, 205, 127)',
                          
@@ -416,9 +376,6 @@ $("#home").attr("class", "inactive")
 
                                         }],
                                 xAxes: [{
-                                        ticks: {
-                                            display: false
-                                        },
                                         stacked: true,
                                         gridLines: {
                                         display: false
@@ -432,10 +389,18 @@ $("#home").attr("class", "inactive")
 
         }
 
-</script>    
+       </script>    
+    </div>
+<!-- Transportation tab ends here -->
 
-<script>
-           
+
+<!-- Rent tab starts here -->
+
+    <div id="rent" class="tab-pane fade">
+      <h3>Rent Per Month</h3>
+        <canvas id="rent-bar-Chart" width="200" height="100"></canvas>
+        <script>
+            console.log("IN THE SCRPIT")
             $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = [];
@@ -443,7 +408,6 @@ $("#home").attr("class", "inactive")
                 var rent = data['rent_per_month'];
 
                 for(var k in rent){ 
-                   
                     labels.push(k);
                     input_data.push(rent[k]);
                 }                   
@@ -457,7 +421,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                             {
-                            label: "Rent per Month",
+                            label: "Average Price in USD",
 
                             backgroundColor: 'rgb(49, 205, 127)',
                          
@@ -482,9 +446,6 @@ $("#home").attr("class", "inactive")
 
                                         }],
                                 xAxes: [{
-                                        ticks: {
-                                            display: false
-                                        },
                                         // stacked: true,
                                         gridLines: {
                                         display: false
@@ -501,8 +462,17 @@ $("#home").attr("class", "inactive")
 
         }
 
-</script>    
-<script>
+       </script>    
+    </div>
+<!-- Rent tab ends here -->
+
+
+<!-- Buy Apartment tab starts here -->
+
+    <div id="buy_apt" class="tab-pane fade">
+      <h3>Buying Apartment</h3>
+        <canvas id="buyApt-bar-Chart" width="200" height="100"></canvas>
+        <script>
             
             $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
@@ -510,7 +480,6 @@ $("#home").attr("class", "inactive")
                 var input_data = [];
                 var buy_apt = data['buy_apt_price'];
                 for(var k in buy_apt){ 
-                    // k = k.split("(")[0];
                     labels.push(k);
                     input_data.push(buy_apt[k]);
                 }                                 
@@ -524,7 +493,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                             {
-                            label: "Buying Apartment",
+                            label: "Average Price in USD",
 
                             backgroundColor: 'rgb(49, 205, 127)',
                          
@@ -548,9 +517,6 @@ $("#home").attr("class", "inactive")
 
                                         }],
                                 xAxes: [{
-                                        ticks: {
-                                            display: false
-                                        },
                                         stacked: true,
                                         gridLines: {
                                         display: false
@@ -564,16 +530,25 @@ $("#home").attr("class", "inactive")
 
         }
 
-</script>    
-<script>
-           
+       </script>    
+    </div>
+<!-- Buy Apartment tab ends here -->
+
+<!-- Buy Apartment tab starts here -->
+
+    <div id="sports" class="tab-pane fade">
+      <h3>Sports and Leisure</h3>
+        <div>
+        <canvas id="sports-bar-Chart" width="200" height="100"></canvas>
+        </div>
+        <script>
+            console.log("IN THE SCRPIT")
             $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = [];
                 var input_data = [];
                 var sports = data['sports_and_leisure'];
                 for(var k in sports){ 
-                 
                     labels.push(k);
                     input_data.push(sports[k]);
                 }                                 
@@ -585,7 +560,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                             {
-                            label: "Sports and Leisure",
+                            label: "Average Price in USD",
 
                             backgroundColor: 'rgb(49, 205, 127)',
                          
@@ -609,9 +584,6 @@ $("#home").attr("class", "inactive")
 
                                         }],
                                 xAxes: [{
-                                        ticks: {
-                                            display: false
-                                        },
                                         stacked: true,
                                         gridLines: {
                                         display: false
@@ -625,84 +597,44 @@ $("#home").attr("class", "inactive")
 
         }
 
-</script>    
+       </script>    
+    </div>
+
+<!-- Sports and Leisure ends here -->
+
+ 
+<!-- 'salaries_and_fin': {'Mortgage Interest Rate in Percentages (%)': '3.90068965517', 'Average Monthly Disposable Salary (Net After Tax)': '4355.79531915'}
+
+
+ -->
+
+<div id="salary" class="tab-pane fade">
+      <h3>Salary and Mortgage</h3>
+      
+          <img src="http://www.easiestcreditcard.net/wp-content/uploads/2014/03/house-mortgage.jpg" class="img-circle" alt="Cinque Terre" width="304" height="236">
+          <div id="salary_results"></div>
+          <script>
+            $.get("/show_price_chart_data?zipcode={{ zipcode }}", showSalaryMortgage);
+            function showSalaryMortgage(data){
+                var salaries = data['salaries_and_fin'];
+                for(var k in salaries){ 
+                    $("#salary_results").append("<p>"+k+ ": " +"<b>"+salaries[k]+ "</p>");            
+                       console.log(k, salaries[k]);
+                }                                 
+            };
+         </script>
+
+   </div>
 </div>
 
-      
-         
-        <!-- <div id="salary_results"></div>
-         <img src="http://www.easiestcreditcard.net/wp-content/uploads/2014/03/house-mortgage.jpg" class="img-circle" alt="Cinque Terre" width="304" height="236">
- -->
-        //  <script>
 
-        //     $.get("/show_price_chart_data?zipcode={{ zipcode }}", showSalaryMortgage);
-        //     function showSalaryMortgage(data){
-        //         var salaries = data['salaries_and_fin'];
-        //         for(var k in salaries){ 
-        //             $("#salary_results").append("<p>"+k+ ": " +"<b>"+salaries[k]+ "</p>");            
-        //                console.log(k, salaries[k]);
-        //         }                                 
-        //     };
-        // </script>
-
-
-
-
+</div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 <!-- Bootstrap tab menu for cost of living prices  -->
-
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
-            <div class="navbar-header">
-              <a class="navbar-brand" href="/">Help Me Relocate</a>
-            </div>
-            <ul class="nav navbar-nav">
-                <li id="home" class="active"><a href="/search">Search</a></li>
-                <li id="overview"><a href="/show_city?zipcode={{ zipcode }}">Overview</a></li>
-                <li id="school"><a href="/show_school?zipcode={{ zipcode }}">Schools</a></li>  
-                <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="/cost_of_living?zipcode={{ zipcode }}">Cost of Living<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                      <li class="active"><a href="#cost-living">Cost of Living</a></li>
-                      <li><a href="#price-items">Prices</a></li>
-                      <!-- <li><a href="#">Page 1-3</a></li> -->
-                    </ul>
-                </li>
-               
-                <li id="crime"><a href="/crime_rate?zipcode={{ zipcode }}">Safety</a></li>
-            </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-             
-             
-            {% if "user_id" in session %}
-                <li><a href="/logout">Logout</a></li>
-                <li><a href="/show_favorites">Show Favorites</a></li>
-                <li><a id="favorite"><span id="favorite_star" class="glyphicon glyphicon-star-empty"></span></a></li>
-               
-            {% else %}
-                <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-        
-           {% endif %}
-            </ul>
-    </div>
-</nav>
-
-
-
-
-
-
-        
-
-
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
-<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 
 

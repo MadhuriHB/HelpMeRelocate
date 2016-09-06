@@ -74,11 +74,13 @@
                             }
                         }
                   
-                  alert(zipcode);
+                  var response = confirm("The Neighborhood you clicked is "+zipcode);
+                  if(response === true){
                   $.get("/show_city?zipcode="+zipcode, function(result){
                       var body = $("body");
                       body.html(result);
                   });
+                 }
 
                 }          
                           else

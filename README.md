@@ -19,24 +19,37 @@ You can also:
 
 > The simple design of this app is to make it easy for users to search their neighborhoods.
 
+
 > Easy click on the google map to search the neighborhoods.
+
+![Help Me Relocate Homepage](/static/images/"homepage.png")
 
 > Clear and simple page which shows images and a short info about the city and climate.
 
-City: 
  
- ![City]("/static/images/show_city.png")
+ ![Help Me Relocate city page](/static/images/show_city.png)
 
 
 > Schools are shown on map with marker for each school showing school name, address and school score. Also, a table to access other details of school, like parent rating, website url etc.
 
+![Help Me Relocate school page](/static/images/show_schools.png)
+
 > Cost of living page shows a simple and clean chart which shows different indices for the neighborhood.
+
+![Help Me Relocate cost of living page](/static/images/cost_of_living.png)
 
 > Cost of living page also categorizes the prices for different items like Restaurants, Groceries, Clothing etc and shows them on charts so users can quickly get the idea.
 
+![Help Me Relocate price items page](/static/images/Restaurants.png)
+
+
 >Comparison page shows user's favorite neighborhoods and selecting two neighborhoods, compares them by cost of living and shows it on a bar chart. 
 
+![Help Me Relocate Comparison page](/static/images/compare_cost.png)
+
 >Schools are also compared for the two neighborhoods by scores and parent ratings  and shown on bubble chart.
+
+![Help Me Relocate Comparison schools page](/static/images/compare_schools.png)
 
 ### Tech
 
