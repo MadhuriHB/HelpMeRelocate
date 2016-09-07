@@ -1,0 +1,21 @@
+
+
+
+
+.navbar {
+    border-radius:0;
+}
+
+.thumbnail {
+    position: relative;
+    margin-top: -20px ;
+    padding: 0;
+   
+}
+
+.caption {
+    position: absolute;
+    top: 45%;
+    left: 0;
+    width: 100%;
+}
