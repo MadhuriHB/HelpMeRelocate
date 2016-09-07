@@ -13,7 +13,7 @@ $("#home").attr("class", "inactive")
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 <div class="container">
-  <h2 align="center">Cost Of Living</h2>
+  <h2>Cost Of Living</h2>
   <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#cost">Cost Indices</a></li>
     <li><a data-toggle="tab" href="#restaurants">Restaurants</a></li>
@@ -26,10 +26,13 @@ $("#home").attr("class", "inactive")
     <li><a data-toggle="tab" href="#salary">Salaries and Finance</a></li>
   </ul>
 
-          <div class="tab-content" width="100%">
-            <div id="cost" class="tab-pane fade in active">
-              <h3>Cost Indices</h3>
+          <div class="tab-content">
+            <div id="cost" class="tab-pane fade active in">
+              <h3 align="center">Cost of Living</h3>
+              <div>
               <canvas id="barChart"  width="700" height="400"></canvas>
+             </div>
+              
               <script>
 
 
@@ -52,7 +55,7 @@ $("#home").attr("class", "inactive")
 
                     datasets: [
                         {
-                            label: {{ zipcode }},
+                            label: "{{zipcode}}",
 
                             backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
@@ -108,20 +111,19 @@ $("#home").attr("class", "inactive")
             }
 
             </script>
+
+
         </div>
 
 
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
-<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script> -->
 
-<!-- restaurant tab starts here -->
     <div id="restaurants" class="tab-pane fade">
-      <h3>Restaurants</h3>
+      <h3 align="center">Restaurants</h3>
         <div>
         <canvas id="restaurant-bar-Chart"  width="200" height="100"></canvas>
         </div>
         <script>
-            
+            console.log("IN THE SCRPIT")
             $.get("/show_price_chart_data?zipcode={{ zipcode }}", makePriceBarChart);
             function makePriceBarChart(data){
                 var labels = []
@@ -183,11 +185,11 @@ $("#home").attr("class", "inactive")
 
     </script>
 </div>
-<!-- restaurant tab ends here -->
-<!-- clothing tab starts here -->
+    <!-- restaurant tab ends here
+    clothing tab starts here -->
 
     <div id="clothing" class="tab-pane fade">
-      <h3>Clothing and Shoes</h3>
+      <h3 align="center">Clothing and Shoes</h3>
 
         <canvas id="clothing-bar-Chart" width="200" height="100"></canvas>
         <script>
@@ -254,12 +256,13 @@ $("#home").attr("class", "inactive")
     </script>    
 </div>
 
+
 <!-- clothing tab ends here -->
 
 <!-- market tab starts here   -->
 
     <div id="markets" class="tab-pane fade">
-      <h3>Markets</h3>
+      <h3 align="center">Markets</h3>
         <canvas id="market-bar-Chart" width="200" height="100"></canvas>
         <script>
             console.log("IN THE SCRPIT")
@@ -331,7 +334,7 @@ $("#home").attr("class", "inactive")
 <!-- Transportation tab starts here -->
 
     <div id="transportation" class="tab-pane fade">
-      <h3>Transportation</h3>
+      <h3 align="center">Transportation</h3>
         <canvas id="transportation-bar-Chart" width="200" height="100"></canvas>
         <script>
             console.log("IN THE SCRPIT")
@@ -395,9 +398,8 @@ $("#home").attr("class", "inactive")
 
 
 <!-- Rent tab starts here -->
-
     <div id="rent" class="tab-pane fade">
-      <h3>Rent Per Month</h3>
+      <h3 align="center">Rent Per Month</h3>
         <canvas id="rent-bar-Chart" width="200" height="100"></canvas>
         <script>
             console.log("IN THE SCRPIT")
@@ -470,7 +472,7 @@ $("#home").attr("class", "inactive")
 <!-- Buy Apartment tab starts here -->
 
     <div id="buy_apt" class="tab-pane fade">
-      <h3>Buying Apartment</h3>
+      <h3 align="center">Buying Apartment</h3>
         <canvas id="buyApt-bar-Chart" width="200" height="100"></canvas>
         <script>
             
@@ -532,12 +534,12 @@ $("#home").attr("class", "inactive")
 
        </script>    
     </div>
-<!-- Buy Apartment tab ends here -->
-
+<!-- Buy Apartment tab ends here
+ -->
 <!-- Buy Apartment tab starts here -->
 
     <div id="sports" class="tab-pane fade">
-      <h3>Sports and Leisure</h3>
+      <h3 align="center">Sports and Leisure</h3>
         <div>
         <canvas id="sports-bar-Chart" width="200" height="100"></canvas>
         </div>
@@ -598,18 +600,12 @@ $("#home").attr("class", "inactive")
         }
 
        </script>    
-    </div>
+    </div> 
 
 <!-- Sports and Leisure ends here -->
 
- 
-<!-- 'salaries_and_fin': {'Mortgage Interest Rate in Percentages (%)': '3.90068965517', 'Average Monthly Disposable Salary (Net After Tax)': '4355.79531915'}
-
-
- -->
-
 <div id="salary" class="tab-pane fade">
-      <h3>Salary and Mortgage</h3>
+      <h3 align="center">Salary and Mortgage</h3>
       
           <img src="http://www.easiestcreditcard.net/wp-content/uploads/2014/03/house-mortgage.jpg" class="img-circle" alt="Cinque Terre" width="304" height="236">
           <div id="salary_results"></div>
@@ -629,12 +625,43 @@ $("#home").attr("class", "inactive")
 
 
 </div>
-</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 <!-- Bootstrap tab menu for cost of living prices  -->
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span></a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li id="home" class="active"><a href="/search"><span class="glyphicon glyphicon-search"></span></a></li>
+                <li id="overview"><a href="/show_city?zipcode={{ zipcode }}">Overview</a></li>
+                <li id="school"><a href="/show_school?zipcode={{ zipcode }}">Schools</a></li>  
+                <li id="cost"><a href="/cost_of_living?zipcode={{ zipcode }}">Cost of Living</a></li>
+                <li id="crime"><a href="/crime_rate?zipcode={{ zipcode }}">Safety</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+             
+             
+            {% if "user_id" in session %}
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="/show_favorites">Show Favorites</a></li>
+                <li><button id="favorite" class="btn btn-primary" type="submit"> <span id="favorite_star" class="glyphicon glyphicon-star-empty"></span>Favorite</button></li>
+                
+            {% else %}
+                <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        
+           {% endif %}
+            </ul>
+    </div>
+</nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 
 
 

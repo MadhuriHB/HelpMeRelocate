@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
+
+
 <div class="well spaced" style="width:40%;">
 <div>
     <h1>Login</h1>
@@ -7,22 +9,27 @@
 
         <div class="form-group">
             <label>Email:
-                <input type="email" name="email" required class="form-control">
+                <input type="email" name="email" value="Madhuri@yahoo.com" required class="form-control">
             </label>
         </div>
 
         <div class="form-group">
             <label>Password:
-                <input type="password" name="password" required class="form-control">
+                <input type="password" name="password" value="Madhuri" required class="form-control">
             </label>
         </div>
 
         <div class="form-group">
-            <input type="submit" value="Log In" class="btn btn-submit">
+            <input type="submit" value="Log In" class="btn btn-success">
         </div>
 
     </form>
 </div>
 </div>
+
+
+
+    
+
 
 {% endblock %}

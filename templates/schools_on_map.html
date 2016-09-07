@@ -148,11 +148,14 @@ $("#home").attr("class", "inactive")
       
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
+        
             <div class="navbar-header">
-              <a class="navbar-brand" href="/">Help Me Relocate</a>
+              <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span></a>
             </div>
+            
             <ul class="nav navbar-nav">
-                <li id="home" class="active"><a href="/search">Search</a></li>
+
+                <li id="home" class="active"><a href="/search"><span class="glyphicon glyphicon-search"></span></a></li>
                 <li id="overview"><a href="/show_city?zipcode={{ zipcode }}">Overview</a></li>
                 <li id="school"><a href="/show_school?zipcode={{ zipcode }}">Schools</a></li>  
                 <li id="cost"><a href="/cost_of_living?zipcode={{ zipcode }}">Cost of Living</a></li>

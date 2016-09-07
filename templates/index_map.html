@@ -25,7 +25,7 @@
          
           var mapProp = {
             center:myLatLng,
-            zoom:15,
+            zoom: 5,
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             clickableIcons: true
           };
@@ -71,7 +71,7 @@
                             }
                         }
                   
-                  var response = confirm("Would you like to start a search for the zipcode "+zipcode);
+                  var response = confirm("Would you like to start a search for the zipcode "+zipcode+"?");
                   if(response === true){
                   $.get("/show_city?zipcode="+zipcode, function(result){
                       var body = $("body");

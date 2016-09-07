@@ -367,7 +367,7 @@ def show_crime_rate():
                       }
     
     new_dict = dict((new_crime_data[key], value) for (key, value) in crime_data.items())
-    print "NEW DICTIONARY!!!!!!!!", new_dict
+   
     return jsonify(new_dict)
 
     	
@@ -433,7 +433,7 @@ def login_process():
 
     session["user_id"] = user.user_id
 
-    flash("You are now Logged in")
+    # flash("You are now Logged in")
     return redirect("/")
 
 
@@ -442,7 +442,7 @@ def logout():
     """Log out."""
 
     del session["user_id"]
-    flash("You are now logged Out.")
+    # flash("You are now logged Out.")
     return redirect("/")
 
 

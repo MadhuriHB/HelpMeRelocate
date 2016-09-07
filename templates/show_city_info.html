@@ -63,14 +63,14 @@ $("#home").attr("class", "inactive")
 
     <div class="row">
           <div class="col-md-6" style="padding-right:20px; border-right: 1px solid #ccc;">
-              <h3>Summary</h3> <br>
-              <blockquote>{{ summary }}</blockquote>
+              <h3 align="center">Summary</h3> <br>
+              <blockquote align="justify">{{ summary }}</blockquote>
           </div>
 
           <div class="col-md-6">
                {% if climate is not none %}
-                <h3>Climate</h3> <br>
-                <blockquote>{{ climate }}</blockquote>
+                <h3 align="center">Climate</h3> <br>
+                <blockquote align="justify">{{ climate }}</blockquote>
                {% endif %}
           </div>
     </div>
@@ -84,10 +84,10 @@ $("#home").attr("class", "inactive")
     <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
             <div class="navbar-header">
-              <a class="navbar-brand" href="/">Help Me Relocate</a>
+              <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span></a>
             </div>
             <ul class="nav navbar-nav">
-                <li id="home" class="active"><a href="/search">Search</a></li>
+                <li id="home" class="active"><a href="/search"><span class="glyphicon glyphicon-search"></span></a></li>
                 <li id="overview"><a href="/show_city?zipcode={{ zipcode }}">Overview</a></li>
                 <li id="school"><a href="/show_school?zipcode={{ zipcode }}">Schools</a></li>  
                 <li id="cost"><a href="/cost_of_living?zipcode={{ zipcode }}">Cost of Living</a></li>
