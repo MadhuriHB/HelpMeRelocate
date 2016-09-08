@@ -49,7 +49,7 @@ You can also:
 
 >Schools are also compared for the two neighborhoods by scores and parent ratings  and shown on bubble chart.
 
-![Help Me Relocate Comparison schools page](/static/images/compare_schools.png)
+![Help Me Relocate Comparison schools page](/static/images/comparison_schools_new.png)
 
 ### Tech
 
